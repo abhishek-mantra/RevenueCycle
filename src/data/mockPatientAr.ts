@@ -1,0 +1,75 @@
+import { PatientArBalance, ClawbackEntry } from "@/schema/patientArSchema";
+
+export const mockPatientArBalances: PatientArBalance[] = [
+  {
+    id: "AR-101",
+    patientId: "PAT-001",
+    patientName: "Sarah Jenkins",
+    invoiceableBalance: 30.0,
+    nonInvoiceableBalance: 0.0,
+    lastAdjudicatedDate: "2026-08-04",
+    primaryPayer: "Blue Cross Blue Shield",
+    hasActiveClawback: false,
+  },
+  {
+    id: "AR-102",
+    patientId: "PAT-002",
+    patientName: "Michael Vance",
+    invoiceableBalance: 0.0,
+    nonInvoiceableBalance: 220.0, // Adjudication pending — Non-Invoiceable!
+    lastAdjudicatedDate: "Awaiting ERA",
+    primaryPayer: "Aetna Behavioral",
+    hasActiveClawback: true,
+  },
+  {
+    id: "AR-103",
+    patientId: "PAT-003",
+    patientName: "Elena Rostova",
+    invoiceableBalance: 125.0,
+    nonInvoiceableBalance: 140.0,
+    lastAdjudicatedDate: "2026-08-02",
+    primaryPayer: "United Healthcare",
+    hasActiveClawback: false,
+  },
+  {
+    id: "AR-104",
+    patientId: "PAT-004",
+    patientName: "David Miller",
+    invoiceableBalance: 175.0,
+    nonInvoiceableBalance: 0.0,
+    lastAdjudicatedDate: "2026-08-01",
+    primaryPayer: "Cigna Health",
+    hasActiveClawback: true,
+  },
+];
+
+export const mockClawbacks: ClawbackEntry[] = [
+  {
+    id: "CLAW-901",
+    claimId: "CLM-2026-7710",
+    encounterId: "ENC-301",
+    patientId: "PAT-002",
+    patientName: "Michael Vance",
+    payerName: "Aetna Behavioral",
+    originalPayment: 180.0,
+    reversalAmount: 180.0,
+    reasonCode: "CLAW-RETRO-DISENROLL",
+    plainEnglishReason: "Payer retroactively reversed payment claiming member coverage terminated 3 days prior to service date.",
+    reversalDate: "2026-08-01",
+    status: "Disputed",
+  },
+  {
+    id: "CLAW-902",
+    claimId: "CLM-2026-7840",
+    encounterId: "ENC-305",
+    patientId: "PAT-004",
+    patientName: "David Miller",
+    payerName: "Cigna Health",
+    originalPayment: 140.0,
+    reversalAmount: 140.0,
+    reasonCode: "CLAW-COB-PRIMARY",
+    plainEnglishReason: "Payer identified secondary insurance as primary coordinator of benefits post-payout.",
+    reversalDate: "2026-07-28",
+    status: "PendingAction",
+  },
+];

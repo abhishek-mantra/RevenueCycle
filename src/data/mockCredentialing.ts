@@ -1,0 +1,46 @@
+import { CredentialingVaultEntry } from "@/schema/credentialingSchema";
+
+export const mockCredentialingVault: CredentialingVaultEntry[] = [
+  {
+    id: "VAULT-101",
+    providerId: "PRV-10",
+    providerName: "Dr. Evelyn Vance",
+    payerId: "payer-bcbs",
+    payerName: "Blue Cross Blue Shield",
+    trueCredentialingStatus: "Credentialed",
+    transactionEnrollmentStatus: "Live",
+    effectiveDate: "2025-01-01",
+    terminationDate: null,
+    npi: "1849204912",
+    taxId: "XX-XXX4912",
+    isServiceDateValid: true,
+  },
+  {
+    id: "VAULT-102",
+    providerId: "PRV-10",
+    providerName: "Dr. Evelyn Vance",
+    payerId: "payer-aetna",
+    payerName: "Aetna Behavioral Health",
+    trueCredentialingStatus: "Credentialed",
+    transactionEnrollmentStatus: "ProviderActionRequired",
+    effectiveDate: "2026-06-01",
+    terminationDate: null,
+    npi: "1849204912",
+    taxId: "XX-XXX4912",
+    isServiceDateValid: true,
+  },
+  {
+    id: "VAULT-103",
+    providerId: "PRV-12",
+    providerName: "Marcus Sterling, LCSW",
+    payerId: "payer-uhc",
+    payerName: "United Healthcare",
+    trueCredentialingStatus: "Pending",
+    transactionEnrollmentStatus: "EnrollmentPending",
+    effectiveDate: "2026-09-01", // Future effective date! Claims billed prior are BLOCKED!
+    terminationDate: null,
+    npi: "1902849102",
+    taxId: "XX-XXX9102",
+    isServiceDateValid: false,
+  },
+];
