@@ -118,32 +118,36 @@ export const Sidebar: React.FC = () => {
       )}
     >
       <div className="flex flex-col h-full overflow-hidden">
-        {/* Brand Header */}
-        <div className="flex items-center justify-between pb-4 mb-3 border-b border-[var(--border)] shrink-0">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-9 h-9 rounded-2xl bg-[var(--accent)] text-white flex items-center justify-center font-extrabold text-lg shadow-sm shrink-0">
-              M
-            </div>
-            {!sidebarCollapsed && (
-              <div className="truncate">
-                <h1 className="text-[15px] font-bold tracking-tight text-[var(--foreground)] leading-tight">
-                  MantraCare
-                </h1>
-                <p className="text-[10px] font-bold text-[var(--foreground-muted)] tracking-wide uppercase">
-                  RCM Operating System
-                </p>
-              </div>
-            )}
+        {/* Brand Header (No Arrow Button — Logo Click Toggles Sidebar) */}
+        {sidebarCollapsed ? (
+          <div className="flex justify-center pb-3 mb-3 border-b border-[var(--border)] shrink-0 w-full pt-1">
+            <button
+              onClick={toggleSidebar}
+              className="p-1 rounded-2xl hover:bg-[var(--accent-soft)] transition-all cursor-pointer"
+              title="Expand Sidebar"
+            >
+              <img
+                src="/logo-icon.png"
+                alt="MantraCare Logo Icon"
+                className="w-9 h-9 object-contain hover:scale-105 transition-transform"
+              />
+            </button>
           </div>
-
-          <button
-            onClick={toggleSidebar}
-            className="p-1.5 rounded-full neu-soft hover:bg-[var(--accent-soft)] text-[var(--foreground-muted)] hover:text-[var(--accent)] transition-colors shrink-0 cursor-pointer"
-            title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-[var(--border)] shrink-0 pt-1 px-1 overflow-hidden">
+            <button
+              onClick={toggleSidebar}
+              className="p-1 rounded-2xl hover:bg-[var(--accent-soft)] transition-all cursor-pointer text-left w-full flex items-center"
+              title="Click to collapse sidebar"
+            >
+              <img
+                src="/logo-full.png"
+                alt="MantraCare RCM Logo"
+                className="h-14 w-auto max-w-[220px] object-contain object-left scale-[1.55] origin-left my-1 ml-0.5 hover:opacity-90 transition-all"
+              />
+            </button>
+          </div>
+        )}
 
         {/* Navigation Sections */}
         <div className="flex-1 overflow-y-auto space-y-5 pr-1 custom-scrollbar">

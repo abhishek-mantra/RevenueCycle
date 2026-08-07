@@ -19,8 +19,8 @@ export default function SettingsPage() {
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
                 Settings & Regional Flexibility Configuration
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
-                PRD §10 Multi-Country Engine
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--foreground)] border border-black/5">
+                Multi-Country Regional Engine
               </span>
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">

@@ -119,7 +119,7 @@ export default function CredentialingPage() {
               Pre-Submission Effective Date Window Checker (Simulate Rule)
             </h2>
             <span className="text-[11px] text-[var(--foreground-muted)] font-medium">
-              Targeting Migration Failure Mode (PRD §8.6.3)
+              Prevent Invalid Credential Submissions
             </span>
           </div>
 

@@ -80,7 +80,7 @@ export default function HomeDashboard() {
               </span>
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">
-              Monochrome Neumorphic Design • Decoupled Patient AR • Root-Cause Denial Clusters • 90% Touchless Flow
+              Real-time financial analytics, claim adjudication tracking, and automated denial management.
             </p>
           </div>
 
