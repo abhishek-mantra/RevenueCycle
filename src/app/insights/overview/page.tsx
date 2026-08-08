@@ -72,6 +72,9 @@ export default function OverviewPage() {
         {/* Top Header */}
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
+            <p className="text-xs font-bold text-[var(--accent)] uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <span>Welcome back, Alex River</span> 👋
+            </p>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
                 Revenue Cycle Control Tower & Executive Overview
