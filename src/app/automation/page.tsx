@@ -11,11 +11,7 @@ import { Sliders, Mail, Workflow, Activity } from "lucide-react";
 
 export type AutomationTab = "rules" | "patient-statements" | "insurance-intake" | "patient-flow";
 
-interface AutomationProps {
-  defaultTab?: AutomationTab;
-}
-
-export default function AutomationPage({ defaultTab }: AutomationProps) {
+export default function AutomationPage({ defaultTab }: any) {
   const searchParams = useSearchParams();
   const queryTab = searchParams.get("tab") as AutomationTab | null;
 

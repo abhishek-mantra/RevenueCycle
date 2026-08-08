@@ -13,11 +13,7 @@ import { AlertCircle, FileX2, ShieldAlert, GitMerge, FileCode, Radio } from "luc
 
 export type ActionItemsTab = "denials" | "import-errors" | "payer-mapping" | "submission-errors" | "rejections" | "edi-era";
 
-interface WorklistProps {
-  defaultTab?: ActionItemsTab;
-}
-
-export default function WorklistPage({ defaultTab }: WorklistProps) {
+export default function WorklistPage({ defaultTab }: any) {
   const searchParams = useSearchParams();
   const queryTab = searchParams.get("tab") as ActionItemsTab | null;
 
