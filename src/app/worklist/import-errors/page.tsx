@@ -7,15 +7,14 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { AlertOctagon, RefreshCw, FileText, CheckCircle2, ArrowRight } from "lucide-react";
 
-export default function ImportErrorsPage() {
+export default function ImportErrorsPage({ embedInShell }: any) {
   const [items, setItems] = useState([
     { id: "ERR-1", eventId: "EVENT-8810", patient: "Sarah Jenkins", reason: "Missing required CPT procedure code in EHR note handoff", date: "2026-08-04" },
     { id: "ERR-2", eventId: "EVENT-8814", patient: "Michael Vance", reason: "Diagnosis pointer missing primary ICD-10 code F41.1", date: "2026-08-03" },
   ]);
 
-  return (
-    <AppShell>
-      <div className="space-y-6 select-none">
+  const content = (
+    <div className="space-y-6 select-none">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -64,6 +63,7 @@ export default function ImportErrorsPage() {
           </div>
         </div>
       </div>
-    </AppShell>
   );
+
+  return embedInShell ? content : <AppShell>{content}</AppShell>;
 }

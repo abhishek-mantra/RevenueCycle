@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -107,9 +108,12 @@ export default function InvoicingPage() {
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <Link
+                      href={`/invoicing/${inv.id}`}
+                      className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] hover:underline"
+                    >
                       {inv.invoiceNumber}
-                    </span>
+                    </Link>
                     <StatusBadge
                       tone={inv.status === "Paid" ? "success" : inv.status === "Overdue" ? "critical" : "warning"}
                       label={inv.status}
@@ -181,10 +185,10 @@ export default function InvoicingPage() {
             <div className="space-y-4 text-xs">
               <div className="p-4 neu-pressed rounded-2xl space-y-2">
                 <div className="font-bold text-[var(--foreground)]">Invoice Line Item Summary:</div>
-                {activePaymentInvoice.lineItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-[var(--foreground-muted)] font-medium">
+                {(activePaymentInvoice.lineItems || activePaymentInvoice.items || []).map((item, idx) => (
+                  <div key={idx} className="flex justify-between text-[var(--foreground-muted)] font-medium">
                     <span>{item.description}</span>
-                    <span className="tabular-nums font-bold text-[var(--foreground)]">${item.amount.toFixed(2)}</span>
+                    <span className="tabular-nums font-bold text-[var(--foreground)]">${(item.patientDue ?? item.charge).toFixed(2)}</span>
                   </div>
                 ))}
               </div>

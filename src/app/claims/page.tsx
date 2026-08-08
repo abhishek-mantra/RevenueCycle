@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -21,109 +22,37 @@ import {
   RotateCw,
   Send,
 } from "lucide-react";
-
-interface ClaimRecord {
-  id: string;
-  claimId: string;
-  patientName: string;
-  payerName: string;
-  dos: string;
-  submittedAmount: number;
-  allowedAmount?: number;
-  paidAmount?: number;
-  status:
-    | "Draft"
-    | "Submitted"
-    | "AwaitingAcknowledgement"
-    | "InAdjudication"
-    | "Paid"
-    | "Denied";
-  acknowledged: boolean;
-  timelyDaysRemaining: number;
-  source: "native" | "imported";
-}
-
-const mockClaimsList: ClaimRecord[] = [
-  {
-    id: "CLM-101",
-    claimId: "CLM-2026-8910",
-    patientName: "Sarah Jenkins",
-    payerName: "Blue Cross Blue Shield",
-    dos: "2026-08-04",
-    submittedAmount: 175.0,
-    allowedAmount: 145.0,
-    paidAmount: 145.0,
-    status: "Paid",
-    acknowledged: true,
-    timelyDaysRemaining: 85,
-    source: "native",
-  },
-  {
-    id: "CLM-102",
-    claimId: "CLM-2026-8911",
-    patientName: "Michael Vance",
-    payerName: "Aetna Behavioral",
-    dos: "2026-08-03",
-    submittedAmount: 220.0,
-    status: "AwaitingAcknowledgement",
-    acknowledged: false,
-    timelyDaysRemaining: 12,
-    source: "native",
-  },
-  {
-    id: "CLM-103",
-    claimId: "CLM-2026-8912",
-    patientName: "Elena Rostova",
-    payerName: "United Healthcare",
-    dos: "2026-08-02",
-    submittedAmount: 140.0,
-    status: "InAdjudication",
-    acknowledged: true,
-    timelyDaysRemaining: 24,
-    source: "native",
-  },
-  {
-    id: "CLM-104",
-    claimId: "CLM-2026-8913",
-    patientName: "David Miller",
-    payerName: "Cigna Health",
-    dos: "2026-08-01",
-    submittedAmount: 195.0,
-    status: "Denied",
-    acknowledged: true,
-    timelyDaysRemaining: 18,
-    source: "imported",
-  },
-];
+import { mockClaims } from "@/data/mockClaims";
+import { Claim } from "@/schema/claimSchema";
 
 export default function ClaimsPage() {
   const [activeTab, setActiveTab] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeResubmitClaim, setActiveResubmitClaim] = useState<ClaimRecord | null>(null);
+  const [activeResubmitClaim, setActiveResubmitClaim] = useState<Claim | null>(null);
 
-  const filteredClaims = mockClaimsList.filter((claim) => {
+  const filteredClaims = mockClaims.filter((claim) => {
     const matchesSearch =
       claim.claimId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       claim.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       claim.payerName.toLowerCase().includes(searchQuery.toLowerCase());
 
     if (activeTab === "All") return matchesSearch;
-    if (activeTab === "StuckAck") return matchesSearch && !claim.acknowledged;
+    if (activeTab === "StuckAck") return matchesSearch && claim.status === "AwaitingAcknowledgement";
     return matchesSearch && claim.status === activeTab;
   });
 
-  const columns: Column<ClaimRecord>[] = [
+  const columns: Column<Claim>[] = [
     {
       key: "claimId",
       header: "Claim ID",
       accessor: (row) => (
         <div className="flex items-center gap-1.5">
-          <span className="font-mono font-bold text-xs">{row.claimId}</span>
-          {row.source === "imported" && (
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-[var(--surface-muted)] text-[var(--foreground-muted)] border border-[var(--border)]">
-              Imported
-            </span>
-          )}
+          <Link
+            href={`/claims/${row.claimId}`}
+            className="font-mono font-bold text-xs text-[var(--accent)] hover:underline flex items-center gap-1"
+          >
+            {row.claimId}
+          </Link>
         </div>
       ),
       sortable: true,
@@ -131,7 +60,11 @@ export default function ClaimsPage() {
     {
       key: "patientName",
       header: "Patient",
-      accessor: (row) => <span className="font-semibold text-[var(--foreground)]">{row.patientName}</span>,
+      accessor: (row) => (
+        <Link href={`/claims/${row.claimId}`} className="font-semibold text-[var(--foreground)] hover:underline">
+          {row.patientName}
+        </Link>
+      ),
       sortable: true,
     },
     {
@@ -149,7 +82,7 @@ export default function ClaimsPage() {
     {
       key: "submittedAmount",
       header: "Billed",
-      accessor: (row) => `$${row.submittedAmount.toFixed(2)}`,
+      accessor: (row) => `$${(row.submittedAmount ?? row.billedAmount ?? 0).toFixed(2)}`,
       align: "right",
       sortable: true,
     },
@@ -304,7 +237,7 @@ export default function ClaimsPage() {
               <div className="p-3.5 neu-pressed rounded-2xl space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-[var(--foreground-muted)]">Billed Amount:</span>
-                  <span className="font-bold tabular-nums">${activeResubmitClaim.submittedAmount.toFixed(2)}</span>
+                  <span className="font-bold tabular-nums">${(activeResubmitClaim.submittedAmount ?? activeResubmitClaim.billedAmount ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--foreground-muted)]">Original Frequency Code:</span>

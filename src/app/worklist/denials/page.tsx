@@ -24,7 +24,7 @@ import {
   Layers,
 } from "lucide-react";
 
-export default function DenialsPage() {
+export default function DenialsPage({ embedInShell }: any) {
   const [clusters, setClusters] = useState<DenialClusterGroup[]>(mockDenialClusters);
   const [expandedClusterId, setExpandedClusterId] = useState<string | null>("cluster-101");
   const [selectedClaimIds, setSelectedClaimIds] = useState<string[]>([]);
@@ -86,14 +86,13 @@ export default function DenialsPage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 350, damping: 25 } },
   };
 
-  return (
-    <AppShell>
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="space-y-6 select-none"
-      >
+  const content = (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6 select-none"
+    >
         {/* Page Header & Scope Banner */}
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -521,6 +520,7 @@ export default function DenialsPage() {
           )}
         </GlassModal>
       </motion.div>
-    </AppShell>
   );
+
+  return embedInShell ? content : <AppShell>{content}</AppShell>;
 }

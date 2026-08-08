@@ -19,15 +19,14 @@ import {
   Sparkles,
 } from "lucide-react";
 
-export default function PatientStatementsPage() {
+export default function PatientStatementsPage({ embedInShell }: any) {
   const [cadenceDays, setCadenceDays] = useState(14);
   const [maxPatients, setMaxPatients] = useState(50);
   const [enableSms, setEnableSms] = useState(true);
   const [enableEmail, setEnableEmail] = useState(true);
 
-  return (
-    <AppShell>
-      <div className="space-y-6 select-none">
+  const content = (
+    <div className="space-y-6 select-none">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -115,6 +114,7 @@ export default function PatientStatementsPage() {
           </div>
         </div>
       </div>
-    </AppShell>
   );
+
+  return embedInShell ? content : <AppShell>{content}</AppShell>;
 }

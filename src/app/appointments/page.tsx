@@ -22,66 +22,12 @@ import {
   Clock,
   Sparkles,
 } from "lucide-react";
-
-interface AppointmentRow {
-  id: string;
-  time: string;
-  patientName: string;
-  providerName: string;
-  payerName: string;
-  memberId: string;
-  eligibilityStatus: "Eligible" | "Mismatch" | "NoCoverage" | "Pending";
-  preVisitStatus: "Collected" | "LinkSent" | "ActionNeeded";
-  copayAmount: number;
-  deductibleRemaining: number;
-  submittedMemberId?: string;
-  returnedMemberId?: string;
-}
-
-const mockAppointments: AppointmentRow[] = [
-  {
-    id: "APT-101",
-    time: "09:00 AM",
-    patientName: "Sarah Jenkins",
-    providerName: "Dr. Evelyn Vance",
-    payerName: "Blue Cross Blue Shield",
-    memberId: "W20485910",
-    eligibilityStatus: "Eligible",
-    preVisitStatus: "Collected",
-    copayAmount: 30.0,
-    deductibleRemaining: 250.0,
-  },
-  {
-    id: "APT-102",
-    time: "10:30 AM",
-    patientName: "Michael Vance",
-    providerName: "Marcus Sterling, LCSW",
-    payerName: "Aetna Behavioral Health",
-    memberId: "AET-90124",
-    eligibilityStatus: "Mismatch",
-    preVisitStatus: "ActionNeeded",
-    copayAmount: 40.0,
-    deductibleRemaining: 500.0,
-    submittedMemberId: "AET-90124",
-    returnedMemberId: "AET-90124-01",
-  },
-  {
-    id: "APT-103",
-    time: "01:15 PM",
-    patientName: "Elena Rostova",
-    providerName: "Dr. Jonathan Ross",
-    payerName: "United Healthcare",
-    memberId: "UHC-77129",
-    eligibilityStatus: "Eligible",
-    preVisitStatus: "LinkSent",
-    copayAmount: 25.0,
-    deductibleRemaining: 0.0,
-  },
-];
+import { mockAppointments } from "@/data/mockAppointments";
+import { Appointment } from "@/schema/appointmentSchema";
 
 export default function AppointmentsPage() {
-  const [activeEligibilityModal, setActiveEligibilityModal] = useState<AppointmentRow | null>(null);
-  const [activeChargeModal, setActiveChargeModal] = useState<AppointmentRow | null>(null);
+  const [activeEligibilityModal, setActiveEligibilityModal] = useState<Appointment | null>(null);
+  const [activeChargeModal, setActiveChargeModal] = useState<Appointment | null>(null);
 
   return (
     <AppShell>
@@ -235,11 +181,11 @@ export default function AppointmentsPage() {
               <div className="p-4 neu-pressed rounded-2xl space-y-2">
                 <div className="flex justify-between">
                   <span className="text-[var(--foreground-muted)] font-medium">Copay per Session:</span>
-                  <span className="font-bold tabular-nums">${activeEligibilityModal.copayAmount.toFixed(2)}</span>
+                  <span className="font-bold tabular-nums">${(activeEligibilityModal.copayAmount ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--foreground-muted)] font-medium">Deductible Remaining:</span>
-                  <span className="font-bold tabular-nums">${activeEligibilityModal.deductibleRemaining.toFixed(2)}</span>
+                  <span className="font-bold tabular-nums">${(activeEligibilityModal.deductibleRemaining ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--foreground-muted)] font-medium">In-Network Status:</span>
@@ -278,7 +224,7 @@ export default function AppointmentsPage() {
               <div className="p-4 neu-pressed rounded-2xl space-y-2 text-xs">
                 <div className="flex justify-between font-semibold">
                   <span>Line Item: Session Copay</span>
-                  <span className="tabular-nums">${activeChargeModal.copayAmount.toFixed(2)}</span>
+                  <span className="tabular-nums">${(activeChargeModal.copayAmount ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-[var(--foreground-muted)]">
                   <span>Card Processing Fee (2.9%):</span>
@@ -286,7 +232,7 @@ export default function AppointmentsPage() {
                 </div>
                 <div className="border-t border-[var(--border)] pt-2 flex justify-between font-extrabold text-sm text-[var(--foreground)]">
                   <span>Total Amount Due:</span>
-                  <span className="tabular-nums">${(activeChargeModal.copayAmount + 0.87).toFixed(2)}</span>
+                  <span className="tabular-nums">${((activeChargeModal.copayAmount ?? 0) + 0.87).toFixed(2)}</span>
                 </div>
               </div>
 

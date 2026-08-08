@@ -1,19 +1,12 @@
 import { z } from "zod";
 
-export const InvoiceLineItemSchema = z.object({
-  id: z.string(),
+export const InvoiceItemSchema = z.object({
+  cpt: z.string(),
   description: z.string(),
-  cptCode: z.string().optional(),
-  amount: z.number(),
-});
-
-export const ReceiptSchema = z.object({
-  id: z.string(),
-  invoiceId: z.string(),
-  amountPaid: z.number(),
-  timestamp: z.string(),
-  paymentMethod: z.enum(["Card", "ApplePay", "Link", "CardOnFile", "Manual"]),
-  receiptNumber: z.string(),
+  dos: z.string(),
+  charge: z.number(),
+  insuranceCovered: z.number(),
+  patientDue: z.number(),
 });
 
 export const InvoiceSchema = z.object({
@@ -22,17 +15,30 @@ export const InvoiceSchema = z.object({
   encounterId: z.string().nullable(),
   patientId: z.string(),
   patientName: z.string(),
-  patientEmail: z.string(),
-  status: z.enum(["Draft", "Sent", "Paid", "PartiallyPaid", "Overdue", "Void"]),
-  issuedDate: z.string(),
+  patientEmail: z.string().optional(),
+  issueDate: z.string(),
+  issuedDate: z.string().optional(),
+  createdDate: z.string().optional(),
   dueDate: z.string(),
   totalAmount: z.number(),
+  insurancePaid: z.number().optional(),
+  patientResponsibility: z.number().optional(),
   amountPaid: z.number(),
   balanceDue: z.number(),
-  lineItems: z.array(InvoiceLineItemSchema),
-  receipts: z.array(ReceiptSchema),
+  status: z.enum(["Draft", "Sent", "PartiallyPaid", "Paid", "Overdue", "Void"]),
+  receipts: z.array(
+    z.object({
+      id: z.string(),
+      receiptNumber: z.string().optional(),
+      paymentDate: z.string(),
+      amount: z.number(),
+      method: z.string(),
+      reference: z.string(),
+    })
+  ),
+  items: z.array(InvoiceItemSchema).optional(),
+  lineItems: z.array(InvoiceItemSchema).optional(),
 });
 
-export type InvoiceLineItem = z.infer<typeof InvoiceLineItemSchema>;
-export type Receipt = z.infer<typeof ReceiptSchema>;
+export type InvoiceItem = z.infer<typeof InvoiceItemSchema>;
 export type Invoice = z.infer<typeof InvoiceSchema>;

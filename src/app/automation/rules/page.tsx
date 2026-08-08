@@ -7,13 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Sliders, Plus, CheckCircle2, ShieldCheck } from "lucide-react";
 
-export default function AutomationRulesPage() {
+export default function AutomationRulesPage({ embedInShell }: any) {
   const [telehealthRule, setTelehealthRule] = useState(true);
   const [authRequiredRule, setAuthRequiredRule] = useState(true);
 
-  return (
-    <AppShell>
-      <div className="space-y-6 select-none">
+  const content = (
+    <div className="space-y-6 select-none">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -64,6 +63,7 @@ export default function AutomationRulesPage() {
           </div>
         </div>
       </div>
-    </AppShell>
   );
+
+  return embedInShell ? content : <AppShell>{content}</AppShell>;
 }

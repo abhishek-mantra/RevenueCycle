@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -20,6 +21,7 @@ import {
   ArrowRight,
   Sparkles,
 } from "lucide-react";
+import { mockEncounters } from "@/data/mockEncounters";
 
 interface EncounterRecord {
   id: string;
@@ -48,72 +50,7 @@ interface EncounterRecord {
   }[];
 }
 
-const mockEncounters: EncounterRecord[] = [
-  {
-    id: "ENC-401",
-    encounterId: "ENC-2026-401",
-    patientName: "Sarah Jenkins",
-    providerName: "Dr. Evelyn Vance",
-    dos: "2026-08-04",
-    primaryPayer: "Blue Cross Blue Shield",
-    secondaryPayer: "Aetna (Secondary)",
-    totalCharges: 250.0,
-    adjustments: 75.0,
-    insurancePaid: 145.0,
-    patientResponsibility: 30.0,
-    prEligible: 30.0,
-    prIneligible: 0.0,
-    balanceDue: 0.0,
-    status: "Completed",
-    lines: [
-      {
-        cpt: "90837",
-        description: "Psychotherapy 60 min",
-        charge: 200.0,
-        paid: 145.0,
-        balance: 0.0,
-        carc: "CO 45",
-        plainEnglishReason: "Contractual fee schedule adjustment applied per in-network agreement.",
-      },
-      {
-        cpt: "90785",
-        description: "Interactive Complexity Add-on",
-        charge: 50.0,
-        paid: 0.0,
-        balance: 30.0,
-        carc: "PR 1",
-        plainEnglishReason: "Deductible applied to secondary coverage.",
-      },
-    ],
-  },
-  {
-    id: "ENC-402",
-    encounterId: "ENC-2026-402",
-    patientName: "Michael Vance",
-    providerName: "Marcus Sterling, LCSW",
-    dos: "2026-08-03",
-    primaryPayer: "Aetna Behavioral Health",
-    totalCharges: 220.0,
-    adjustments: 0.0,
-    insurancePaid: 0.0,
-    patientResponsibility: 220.0,
-    prEligible: 0.0,
-    prIneligible: 220.0,
-    balanceDue: 220.0,
-    status: "PendingAdjudication",
-    lines: [
-      {
-        cpt: "90791",
-        description: "Psychiatric Diagnostic Evaluation",
-        charge: 220.0,
-        paid: 0.0,
-        balance: 220.0,
-        carc: "CO 197",
-        plainEnglishReason: "Pre-authorization required for initial intake evaluation.",
-      },
-    ],
-  },
-];
+
 
 export default function EncountersPage() {
   const [expandedEncounterId, setExpandedEncounterId] = useState<string | null>("ENC-401");
@@ -209,7 +146,7 @@ export default function EncountersPage() {
                         Charges / Paid
                       </div>
                       <div className="text-[16px] font-extrabold text-[var(--foreground)] tabular-nums">
-                        ${enc.totalCharges.toFixed(2)} / <span className="text-[var(--status-success)]">${enc.insurancePaid.toFixed(2)}</span>
+                        ${(enc.totalCharges ?? 0).toFixed(2)} / <span className="text-[var(--status-success)]">${(enc.insurancePaid ?? 0).toFixed(2)}</span>
                       </div>
                     </div>
 
@@ -218,7 +155,7 @@ export default function EncountersPage() {
                         Patient AR
                       </div>
                       <div className="text-[16px] font-extrabold text-[var(--foreground)] tabular-nums">
-                        ${enc.patientResponsibility.toFixed(2)}
+                        ${(enc.patientResponsibility ?? 0).toFixed(2)}
                       </div>
                     </div>
 
@@ -274,7 +211,7 @@ export default function EncountersPage() {
                         </h4>
 
                         <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden">
-                          {enc.lines.map((line, idx) => (
+                          {(enc.lines ?? []).map((line, idx) => (
                             <div key={idx} className="p-4 bg-[var(--surface)] space-y-2">
                               <div className="flex items-center justify-between text-xs font-bold">
                                 <span>

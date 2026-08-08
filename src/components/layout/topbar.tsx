@@ -9,7 +9,7 @@ import { clsx } from "clsx";
 
 export const Topbar: React.FC = () => {
   const pathname = usePathname();
-  const { role, setRole, sidebarCollapsed } = useAppStore();
+  const { sidebarCollapsed } = useAppStore();
 
   const getPageTitle = () => {
     if (pathname.includes("/insights/overview")) return "Executive Revenue Overview";
@@ -23,7 +23,7 @@ export const Topbar: React.FC = () => {
     if (pathname.includes("/patient-responsibility")) return "Patient AR & Collections";
     if (pathname.includes("/onboarding")) return "System Migration & Shadow Mode Import";
     if (pathname.includes("/worklist/denials")) return "Denial Management & Root-Cause Groups";
-    if (pathname.includes("/worklist")) return "Exception Worklist Queue";
+    if (pathname.includes("/worklist")) return "Action Items & Exception Worklist";
     if (pathname.includes("/credentialing")) return "Credentialing & Transaction Enrollment Vault";
     if (pathname.includes("/automation")) return "Rules & Automation Configuration";
     if (pathname.includes("/settings")) return "Account & System Settings";
@@ -44,8 +44,8 @@ export const Topbar: React.FC = () => {
             <h2 className="text-[16px] font-bold text-[var(--foreground)] tracking-tight">
               {getPageTitle()}
             </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[var(--surface-muted)] text-[var(--foreground-muted)] border border-[var(--border)]">
-              {role === "biller" ? "Cross-Practice Biller" : "Self-Serve Provider"}
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
+              Live Operations
             </span>
           </div>
           <p className="text-[12px] text-[var(--foreground-muted)] font-medium">
@@ -67,47 +67,8 @@ export const Topbar: React.FC = () => {
         </kbd>
       </div>
 
-      {/* Role Switcher & User Profile Pill */}
+      {/* User Actions & Profile Pill */}
       <div className="flex items-center gap-3">
-        {/* Role Switcher Segmented Control with Framer Motion layoutId glide */}
-        <div className="neu-pressed p-1 rounded-full flex items-center gap-1 relative">
-          <button
-            onClick={() => setRole("biller")}
-            className={clsx(
-              "relative px-3.5 py-1 text-[11px] font-bold rounded-full transition-colors cursor-pointer z-10 flex items-center gap-1.5",
-              role === "biller" ? "text-white" : "text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
-            )}
-          >
-            {role === "biller" && (
-              <motion.div
-                layoutId="activeRolePill"
-                className="absolute inset-0 bg-[var(--accent)] rounded-full z-[-1] shadow-xs"
-                transition={{ type: "spring", stiffness: 450, damping: 30 }}
-              />
-            )}
-            <ShieldAlert className="w-3.5 h-3.5" />
-            Biller Mode
-          </button>
-
-          <button
-            onClick={() => setRole("provider")}
-            className={clsx(
-              "relative px-3.5 py-1 text-[11px] font-bold rounded-full transition-colors cursor-pointer z-10 flex items-center gap-1.5",
-              role === "provider" ? "text-white" : "text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
-            )}
-          >
-            {role === "provider" && (
-              <motion.div
-                layoutId="activeRolePill"
-                className="absolute inset-0 bg-[var(--accent)] rounded-full z-[-1] shadow-xs"
-                transition={{ type: "spring", stiffness: 450, damping: 30 }}
-              />
-            )}
-            <UserCheck className="w-3.5 h-3.5" />
-            Provider Mode
-          </button>
-        </div>
-
         {/* Notifications Icon with Badge */}
         <motion.button
           whileHover={{ scale: 1.08 }}

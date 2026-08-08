@@ -32,6 +32,7 @@ import {
   ChevronRight,
   Activity,
   Zap,
+  ShieldAlert,
 } from "lucide-react";
 
 interface NavItem {
@@ -45,12 +46,11 @@ interface NavItem {
 interface NavSection {
   title: string;
   items: NavItem[];
-  billerOnly?: boolean;
 }
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
-  const { role, sidebarCollapsed, toggleSidebar } = useAppStore();
+  const { sidebarCollapsed, toggleSidebar } = useAppStore();
 
   const sections: NavSection[] = [
     {
@@ -74,32 +74,21 @@ export const Sidebar: React.FC = () => {
       ],
     },
     {
-      title: "ACTION ITEMS (EXCEPTIONS)",
-      billerOnly: true,
+      title: "ACTION ITEMS",
       items: [
-        { label: "Denial Management", href: "/worklist/denials", icon: <XCircle className="w-4 h-4" />, badge: 12, badgeColor: "bg-[var(--status-critical-bg)] text-[var(--status-critical)]" },
-        { label: "Import Errors", href: "/worklist/import-errors", icon: <AlertOctagon className="w-4 h-4" />, badge: 2 },
-        { label: "Payer Mappings", href: "/worklist/payer-mapping", icon: <FileX2 className="w-4 h-4" /> },
-        { label: "Submission Errors", href: "/worklist/submission-errors", icon: <Send className="w-4 h-4" />, badge: 4 },
-        { label: "Payer Rejections", href: "/worklist/rejections", icon: <AlertCircle className="w-4 h-4" /> },
-        { label: "EDI / ERA Enrollments", href: "/worklist/edi-era", icon: <Radio className="w-4 h-4" /> },
+        { label: "Action Items Queue", href: "/worklist", icon: <ShieldAlert className="w-4 h-4" />, badge: 30, badgeColor: "bg-[var(--status-critical-bg)] text-[var(--status-critical)]" },
       ],
     },
     {
       title: "CREDENTIALING",
-      billerOnly: true,
       items: [
         { label: "Payer Credentialing", href: "/credentialing", icon: <Award className="w-4 h-4" /> },
       ],
     },
     {
       title: "AUTOMATION CONFIG",
-      billerOnly: true,
       items: [
-        { label: "Billing Scrub Rules", href: "/automation/rules", icon: <Sliders className="w-4 h-4" /> },
-        { label: "Patient Statements", href: "/automation/patient-statements", icon: <Mail className="w-4 h-4" /> },
-        { label: "Insurance Intake", href: "/automation/insurance-intake", icon: <Workflow className="w-4 h-4" /> },
-        { label: "Pre-Visit Flow", href: "/automation/patient-flow", icon: <Activity className="w-4 h-4" /> },
+        { label: "Automation Rules", href: "/automation", icon: <Sliders className="w-4 h-4" /> },
       ],
     },
     {
@@ -152,8 +141,6 @@ export const Sidebar: React.FC = () => {
         {/* Navigation Sections */}
         <div className="flex-1 overflow-y-auto space-y-5 pr-1 custom-scrollbar">
           {sections.map((section, idx) => {
-            if (section.billerOnly && role === "provider") return null;
-
             return (
               <div key={idx} className="space-y-1.5">
                 {!sidebarCollapsed && (
