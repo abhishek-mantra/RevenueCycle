@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import RulesPage from "./rules/page";
@@ -11,7 +11,7 @@ import { Sliders, Mail, Workflow, Activity } from "lucide-react";
 
 export type AutomationTab = "rules" | "patient-statements" | "insurance-intake" | "patient-flow";
 
-export default function AutomationPage({ defaultTab }: any) {
+function AutomationContent({ defaultTab }: any) {
   const searchParams = useSearchParams();
   const queryTab = searchParams.get("tab") as AutomationTab | null;
 
@@ -91,5 +91,19 @@ export default function AutomationPage({ defaultTab }: any) {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+export default function AutomationPage(props: any) {
+  return (
+    <Suspense fallback={
+      <AppShell>
+        <div className="p-8 text-center font-bold text-xs text-[var(--foreground-muted)]">
+          Loading Automation Configuration...
+        </div>
+      </AppShell>
+    }>
+      <AutomationContent {...props} />
+    </Suspense>
   );
 }

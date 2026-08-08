@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import DenialsPage from "./denials/page";
@@ -13,7 +13,7 @@ import { AlertCircle, FileX2, ShieldAlert, GitMerge, FileCode, Radio } from "luc
 
 export type ActionItemsTab = "denials" | "import-errors" | "payer-mapping" | "submission-errors" | "rejections" | "edi-era";
 
-export default function WorklistPage({ defaultTab }: any) {
+function WorklistContent({ defaultTab }: any) {
   const searchParams = useSearchParams();
   const queryTab = searchParams.get("tab") as ActionItemsTab | null;
 
@@ -97,5 +97,19 @@ export default function WorklistPage({ defaultTab }: any) {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+export default function WorklistPage(props: any) {
+  return (
+    <Suspense fallback={
+      <AppShell>
+        <div className="p-8 text-center font-bold text-xs text-[var(--foreground-muted)]">
+          Loading Action Items Worklist...
+        </div>
+      </AppShell>
+    }>
+      <WorklistContent {...props} />
+    </Suspense>
   );
 }
