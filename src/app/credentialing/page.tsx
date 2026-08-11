@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -9,21 +10,16 @@ import { Input } from "@/components/ui/input";
 import { GlassModal } from "@/components/ui/glass-modal";
 import { mockCredentialingVault } from "@/data/mockCredentialing";
 import { CredentialingVaultEntry } from "@/schema/credentialingSchema";
-import { motion } from "framer-motion";
+import { formatDate } from "@/lib/formatDate";
 import {
   Award,
-  ShieldCheck,
   AlertTriangle,
   Calendar,
-  Search,
   Plus,
   Radio,
-  UserCheck,
   Lock,
   CheckCircle2,
   AlertCircle,
-  Clock,
-  ArrowRight,
 } from "lucide-react";
 
 export default function CredentialingPage() {
@@ -53,26 +49,28 @@ export default function CredentialingPage() {
   return (
     <AppShell>
       <div className="space-y-6 select-none">
-        {/* Header */}
+        {/* Header (8.18 - Simplified Title) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Credentialing & Transaction Enrollment Vault
+                Credentialing
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
                 Payer Vault & Effective Dates
               </span>
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">
-              Tracks two parallel statuses per provider-payer pair + pre-submission service date window verification.
+              Verify provider enrollment and active contract effective dates before submitting claims.
             </p>
           </div>
 
-          <Button variant="primary" size="sm" onClick={() => alert("Opened Enrollment Wizard")}>
-            <Plus className="w-4 h-4" />
-            Add Provider Enrollment
-          </Button>
+          <Link href="/credentialing/new">
+            <Button variant="primary" size="sm">
+              <Plus className="w-4 h-4" />
+              Add Provider Enrollment
+            </Button>
+          </Link>
         </div>
 
         {/* KPI Strip */}
@@ -169,7 +167,7 @@ export default function CredentialingPage() {
                     <span className="font-mono">NPI: {entry.npi}</span>
                     <span className="font-mono">Tax ID: {entry.taxId}</span>
                     <span className="tabular-nums font-semibold text-[var(--foreground)]">
-                      Effective: {entry.effectiveDate} {entry.terminationDate ? `to ${entry.terminationDate}` : "(Active)"}
+                      Effective: {formatDate(entry.effectiveDate)} {entry.terminationDate ? `to ${formatDate(entry.terminationDate)}` : "(Active)"}
                     </span>
                   </div>
                 </div>
@@ -226,7 +224,7 @@ export default function CredentialingPage() {
           isOpen={!!activeCheckResult}
           onClose={() => setActiveCheckResult(null)}
           title="Pre-Submission Effective Date Result"
-          description={`Tested DOS: ${testServiceDate}`}
+          description={`Tested DOS: ${formatDate(testServiceDate)}`}
         >
           {activeCheckResult && (
             <div className="space-y-4 text-xs">

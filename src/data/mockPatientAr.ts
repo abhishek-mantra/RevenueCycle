@@ -18,7 +18,7 @@ export const mockPatientArBalances: PatientArBalance[] = [
     invoiceableBalance: 0.0,
     nonInvoiceableBalance: 220.0, // Adjudication pending — Non-Invoiceable!
     lastAdjudicatedDate: "Awaiting ERA",
-    primaryPayer: "Aetna Behavioral",
+    primaryPayer: "Aetna Behavioral Health",
     hasActiveClawback: true,
   },
   {
@@ -50,7 +50,7 @@ export const mockClawbacks: ClawbackEntry[] = [
     encounterId: "ENC-301",
     patientId: "PAT-002",
     patientName: "Michael Vance",
-    payerName: "Aetna Behavioral",
+    payerName: "Aetna Behavioral Health",
     originalPayment: 180.0,
     reversalAmount: 180.0,
     reasonCode: "CLAW-RETRO-DISENROLL",

@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { mockMonthlyRevenueData } from "@/data/mockAnalytics";
-import { motion } from "framer-motion";
 import {
   BarChart,
   Bar,
@@ -19,8 +17,6 @@ import {
 import {
   TrendingUp,
   DollarSign,
-  Calendar,
-  Filter,
   Layers,
   Sparkles,
 } from "lucide-react";
@@ -41,12 +37,12 @@ export default function RevenueAnalysisPage() {
   return (
     <AppShell>
       <div className="space-y-6 select-none">
-        {/* Header */}
+        {/* Header (8.18 - Simplified Title) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Revenue Analysis & Stacked Slicing
+                Revenue Analysis
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
                 Financial Analytics

@@ -7,6 +7,7 @@ import RulesPage from "./rules/page";
 import PatientStatementsPage from "./patient-statements/page";
 import InsuranceIntakePage from "./insurance-intake/page";
 import PatientFlowPage from "./patient-flow/page";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { Sliders, Mail, Workflow, Activity } from "lucide-react";
 
 export type AutomationTab = "rules" | "patient-statements" | "insurance-intake" | "patient-flow";
@@ -14,6 +15,7 @@ export type AutomationTab = "rules" | "patient-statements" | "insurance-intake" 
 function AutomationContent({ defaultTab }: any) {
   const searchParams = useSearchParams();
   const queryTab = searchParams.get("tab") as AutomationTab | null;
+  const { scrubRules } = useRcmDataStore();
 
   const [activeTab, setActiveTab] = useState<AutomationTab>(
     defaultTab || queryTab || "rules"
@@ -25,8 +27,10 @@ function AutomationContent({ defaultTab }: any) {
     }
   }, [queryTab]);
 
+  const activeRulesCount = scrubRules.filter((r) => r.enabled).length;
+
   const tabs = [
-    { id: "rules" as AutomationTab, label: "Billing Scrub Rules", badge: "8 Active Rules", icon: <Sliders className="w-3.5 h-3.5" /> },
+    { id: "rules" as AutomationTab, label: "Billing Scrub Rules", badge: `${activeRulesCount} Active Rules`, icon: <Sliders className="w-3.5 h-3.5" /> },
     { id: "patient-statements" as AutomationTab, label: "Patient Statements & Dunning", badge: "Auto-Cadence", icon: <Mail className="w-3.5 h-3.5" /> },
     { id: "insurance-intake" as AutomationTab, label: "Insurance Intake & OCR", badge: "AI Vision", icon: <Workflow className="w-3.5 h-3.5" /> },
     { id: "patient-flow" as AutomationTab, label: "Pre-Visit Flow & Copays", badge: "Card-on-File", icon: <Activity className="w-3.5 h-3.5" /> },
@@ -35,15 +39,15 @@ function AutomationContent({ defaultTab }: any) {
   return (
     <AppShell>
       <div className="space-y-6 select-none">
-        {/* Consolidated Automation Header */}
+        {/* Simplified Automation Header (8.18) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Rules & Automation Configuration
+                Automation Rules
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
-                Touchless RCM Engine
+                Touchless Engine
               </span>
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">

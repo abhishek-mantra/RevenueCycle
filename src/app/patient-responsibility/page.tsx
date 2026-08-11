@@ -6,38 +6,50 @@ import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { GlassModal } from "@/components/ui/glass-modal";
-import { mockPatientArBalances, mockClawbacks } from "@/data/mockPatientAr";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
+import { formatDate } from "@/lib/formatDate";
 import { ClawbackEntry } from "@/schema/patientArSchema";
-import { motion } from "framer-motion";
 import {
   UserCheck,
   DollarSign,
   AlertOctagon,
-  FileCheck2,
   Lock,
-  ArrowRight,
   ShieldAlert,
   Send,
-  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function PatientResponsibilityPage() {
+  const { patientArBalances, clawbacks } = useRcmDataStore();
   const [activeTab, setActiveTab] = useState<"balances" | "clawbacks">("balances");
   const [activeDisputeClawback, setActiveDisputeClawback] = useState<ClawbackEntry | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const totalInvoiceable = mockPatientArBalances.reduce((acc, b) => acc + b.invoiceableBalance, 0);
-  const totalNonInvoiceable = mockPatientArBalances.reduce((acc, b) => acc + b.nonInvoiceableBalance, 0);
-  const totalClawbacksAtRisk = mockClawbacks.reduce((acc, c) => acc + c.reversalAmount, 0);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const totalInvoiceable = patientArBalances.reduce((acc, b) => acc + b.invoiceableBalance, 0);
+  const totalNonInvoiceable = patientArBalances.reduce((acc, b) => acc + b.nonInvoiceableBalance, 0);
+  const totalClawbacksAtRisk = clawbacks.reduce((acc, c) => acc + c.reversalAmount, 0);
 
   return (
     <AppShell>
       <div className="space-y-6 select-none">
-        {/* Header */}
+        {/* Toast Notification Banner */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-[var(--accent)] text-white font-bold text-xs shadow-2xl flex items-center gap-2 animate-bounce">
+            <CheckCircle2 className="w-4 h-4" /> {toastMessage}
+          </div>
+        )}
+
+        {/* Header (8.18 - Simplified Title) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Patient AR & Decoupled Balances
+                Patient Responsibility
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--foreground)] border border-black/5">
                 Decoupled Patient AR
@@ -70,7 +82,7 @@ export default function PatientResponsibilityPage() {
           <KpiCard
             label="Clawback Ledger at Risk"
             value={`$${totalClawbacksAtRisk.toFixed(2)}`}
-            delta="2 Active reversals"
+            delta={`${clawbacks.length} Active reversals`}
             deltaType="decrease"
             subtitle="Retroactive payer clawbacks"
             icon={<AlertOctagon className="w-5 h-5" />}
@@ -95,7 +107,7 @@ export default function PatientResponsibilityPage() {
                   activeTab === "balances" ? "bg-[var(--accent)] text-white shadow-xs" : "text-[var(--foreground-muted)]"
                 }`}
               >
-                Decoupled Patient Balances ({mockPatientArBalances.length})
+                Decoupled Patient Balances ({patientArBalances.length})
               </button>
               <button
                 onClick={() => setActiveTab("clawbacks")}
@@ -103,7 +115,7 @@ export default function PatientResponsibilityPage() {
                   activeTab === "clawbacks" ? "bg-[var(--accent)] text-white shadow-xs" : "text-[var(--foreground-muted)]"
                 }`}
               >
-                Clawback Ledger ({mockClawbacks.length} Active)
+                Clawback Ledger ({clawbacks.length} Active)
               </button>
             </div>
           </div>
@@ -111,7 +123,7 @@ export default function PatientResponsibilityPage() {
           {activeTab === "balances" ? (
             /* Decoupled AR Table */
             <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)]">
-              {mockPatientArBalances.map((bal) => (
+              {patientArBalances.map((bal) => (
                 <div
                   key={bal.id}
                   className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[var(--surface-muted)] transition-colors"
@@ -124,7 +136,7 @@ export default function PatientResponsibilityPage() {
                       )}
                     </div>
                     <div className="text-xs text-[var(--foreground-muted)] font-medium">
-                      Primary Payer: {bal.primaryPayer} | Adjudicated: {bal.lastAdjudicatedDate}
+                      Primary Payer: {bal.primaryPayer} | Adjudicated: {formatDate(bal.lastAdjudicatedDate)}
                     </div>
                   </div>
 
@@ -153,7 +165,7 @@ export default function PatientResponsibilityPage() {
                       size="sm"
                       variant={bal.invoiceableBalance > 0 ? "primary" : "secondary"}
                       disabled={bal.invoiceableBalance === 0}
-                      onClick={() => alert(`Generated statement for ${bal.patientName} ($${bal.invoiceableBalance.toFixed(2)})`)}
+                      onClick={() => showToast(`Generated statement for ${bal.patientName} ($${bal.invoiceableBalance.toFixed(2)})`)}
                     >
                       {bal.invoiceableBalance > 0 ? "Generate Statement" : "Awaiting ERA"}
                     </Button>
@@ -172,7 +184,7 @@ export default function PatientResponsibilityPage() {
               </div>
 
               <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)]">
-                {mockClawbacks.map((claw) => (
+                {clawbacks.map((claw) => (
                   <div key={claw.id} className="p-5 space-y-2 hover:bg-[var(--surface-muted)] transition-colors">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
@@ -224,7 +236,7 @@ export default function PatientResponsibilityPage() {
               <div className="p-3.5 neu-pressed rounded-2xl space-y-1.5">
                 <div className="font-bold text-[var(--foreground)]">Extracted Timely Evidence:</div>
                 <p className="text-[var(--foreground-muted)]">
-                  MantraCare EHR eligibility log confirms member was active on DOS ({activeDisputeClawback.reversalDate}).
+                  MantraCare EHR eligibility log confirms member was active on DOS ({formatDate(activeDisputeClawback.reversalDate)}).
                 </p>
               </div>
 
@@ -245,7 +257,7 @@ export default function PatientResponsibilityPage() {
                   variant="primary"
                   size="sm"
                   onClick={() => {
-                    alert("Clawback dispute submitted to payer!");
+                    showToast("Clawback dispute submitted to payer!");
                     setActiveDisputeClawback(null);
                   }}
                 >

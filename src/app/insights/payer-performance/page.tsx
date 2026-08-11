@@ -1,34 +1,38 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
-import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { mockPayerPerformance, mockContractVariances } from "@/data/mockAnalytics";
-import { motion } from "framer-motion";
-import {
-  BarChart3,
-  DollarSign,
-  AlertTriangle,
-  Clock,
-  CheckCircle2,
-  ShieldAlert,
-  ArrowRight,
-} from "lucide-react";
+import { CheckCircle2, ShieldAlert } from "lucide-react";
 
 export default function PayerPerformancePage() {
   const [activeTab, setActiveTab] = useState<"performance" | "variance" | "reconciliation">("performance");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   return (
     <AppShell>
       <div className="space-y-6 select-none">
-        {/* Header */}
+        {/* Toast Notification Banner */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-[var(--accent)] text-white font-bold text-xs shadow-2xl flex items-center gap-2 animate-bounce">
+            <CheckCircle2 className="w-4 h-4" /> {toastMessage}
+          </div>
+        )}
+
+        {/* Header (8.18 - Simplified Title) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Payer Performance & Contract Variance
+                Payer Performance
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
                 Payer ROI & Variance Detection
@@ -100,13 +104,11 @@ export default function PayerPerformancePage() {
                       </div>
                     </div>
 
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => alert(`Viewing detailed contract rules for ${row.payerName}`)}
-                    >
-                      Payer Analysis
-                    </Button>
+                    <Link href={`/insights/payer-performance/${row.id}`}>
+                      <Button size="sm" variant="secondary">
+                        Payer Analysis
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -146,7 +148,7 @@ export default function PayerPerformancePage() {
                         </div>
                       </div>
 
-                      <Button size="sm" variant="primary" onClick={() => alert(`Dispute filed for claim ${item.claimId}`)}>
+                      <Button size="sm" variant="primary" onClick={() => showToast(`Dispute filed for claim ${item.claimId}!`)}>
                         Submit Variance Appeal
                       </Button>
                     </div>

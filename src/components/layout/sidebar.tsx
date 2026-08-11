@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppStore } from "@/store/useAppStore";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { clsx } from "clsx";
 import {
   LayoutDashboard,
@@ -17,22 +17,12 @@ import {
   Receipt,
   UserCheck,
   Building2,
-  AlertOctagon,
-  FileX2,
-  Send,
-  XCircle,
-  AlertCircle,
-  Radio,
   Award,
   Sliders,
-  Mail,
-  Workflow,
   Settings,
-  ChevronLeft,
-  ChevronRight,
-  Activity,
   Zap,
   ShieldAlert,
+  ChevronDown,
 } from "lucide-react";
 
 interface NavItem {
@@ -99,19 +89,42 @@ export const Sidebar: React.FC = () => {
     },
   ];
 
+  // Initialize expanded sections: only expand the section containing active route on load
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    sections.forEach((sec) => {
+      const hasActive = sec.items.some((item) => pathname.startsWith(item.href));
+      initial[sec.title] = hasActive;
+    });
+    // Fallback: if no active section found, default INSIGHTS & ANALYTICS or DAILY OPERATIONS open
+    if (!Object.values(initial).some(Boolean)) {
+      initial["DAILY OPERATIONS"] = true;
+    }
+    return initial;
+  });
+
+  const toggleSection = (title: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
+
   return (
     <aside
+      aria-label="Main Navigation Sidebar"
       className={clsx(
         "glass-chrome fixed top-4 left-4 bottom-4 z-40 transition-all duration-300 flex flex-col justify-between shadow-xl border border-white/70 select-none rounded-3xl",
         sidebarCollapsed ? "w-20 p-3" : "w-64 p-4"
       )}
     >
       <div className="flex flex-col h-full overflow-hidden">
-        {/* Brand Header (No Arrow Button — Logo Click Toggles Sidebar) */}
+        {/* Brand Header */}
         {sidebarCollapsed ? (
           <div className="flex justify-center pb-3 mb-3 border-b border-[var(--border)] shrink-0 w-full pt-1">
             <button
               onClick={toggleSidebar}
+              aria-label="Expand sidebar"
               className="p-1 rounded-2xl hover:bg-[var(--accent-soft)] transition-all cursor-pointer"
               title="Expand Sidebar"
             >
@@ -126,6 +139,7 @@ export const Sidebar: React.FC = () => {
           <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-[var(--border)] shrink-0 pt-1 px-1 overflow-hidden">
             <button
               onClick={toggleSidebar}
+              aria-label="Collapse sidebar"
               className="p-1 rounded-2xl hover:bg-[var(--accent-soft)] transition-all cursor-pointer text-left w-full flex items-center"
               title="Click to collapse sidebar"
             >
@@ -139,70 +153,97 @@ export const Sidebar: React.FC = () => {
         )}
 
         {/* Navigation Sections */}
-        <div className="flex-1 overflow-y-auto space-y-5 pr-1 custom-scrollbar">
-          {sections.map((section, idx) => {
+        <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
+          {sections.map((section) => {
+            const isExpanded = !!expandedSections[section.title];
+            const hasActiveChild = section.items.some((item) => pathname.startsWith(item.href));
+
             return (
-              <div key={idx} className="space-y-1.5">
-                {!sidebarCollapsed && (
-                  <div className="px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--foreground-faint)]">
-                    {section.title}
-                  </div>
-                )}
+              <div key={section.title} className="space-y-1">
+                {!sidebarCollapsed ? (
+                  <button
+                    onClick={() => toggleSection(section.title)}
+                    aria-label={`Toggle ${section.title} section`}
+                    aria-expanded={isExpanded}
+                    className="w-full px-2 py-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[var(--foreground-faint)] hover:text-[var(--foreground)] hover:bg-[var(--accent-soft)]/40 transition-all rounded-xl group cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 border-none"
+                  >
+                    <span className={clsx(hasActiveChild && !isExpanded && "text-[var(--accent)] font-extrabold")}>
+                      {section.title}
+                    </span>
+                    <ChevronDown
+                      className={clsx(
+                        "w-3.5 h-3.5 transition-transform duration-200 text-[var(--foreground-faint)] group-hover:text-[var(--foreground)]",
+                        isExpanded && "rotate-180"
+                      )}
+                    />
+                  </button>
+                ) : null}
 
-                <div className="space-y-1">
-                  {section.items.map((item) => {
-                    const isActive = pathname === item.href;
+                <AnimatePresence initial={false}>
+                  {(isExpanded || sidebarCollapsed) && (
+                    <motion.div
+                      initial={sidebarCollapsed ? false : { height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={sidebarCollapsed ? undefined : { height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-1 overflow-hidden"
+                    >
+                      {section.items.map((item) => {
+                        const isActive = pathname === item.href;
 
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={clsx(
-                          "relative flex items-center gap-3 px-3 py-2 rounded-2xl text-[13px] font-medium transition-all group",
-                          isActive
-                            ? "text-white font-semibold"
-                            : "text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--accent-soft)]"
-                        )}
-                        title={sidebarCollapsed ? item.label : undefined}
-                      >
-                        {isActive && (
-                          <motion.div
-                            layoutId="activeNavPill"
-                            className="absolute inset-0 bg-[var(--accent)] rounded-2xl z-[-1] shadow-md"
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                          />
-                        )}
-
-                        <div
-                          className={clsx(
-                            "shrink-0 transition-transform group-hover:scale-110",
-                            isActive ? "text-white" : "text-[var(--foreground-muted)]"
-                          )}
-                        >
-                          {item.icon}
-                        </div>
-
-                        {!sidebarCollapsed && (
-                          <div className="flex items-center justify-between w-full truncate">
-                            <span className="truncate">{item.label}</span>
-                            {item.badge !== undefined && (
-                              <span
-                                className={clsx(
-                                  "px-2 py-0.5 text-[10px] font-bold rounded-full tabular-nums ml-2 shrink-0 border border-current/10",
-                                  isActive
-                                    ? "bg-white/20 text-white"
-                                    : item.badgeColor || "bg-[var(--accent-soft)] text-[var(--accent)]"
-                                )}
-                              >
-                                {item.badge}
-                              </span>
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            aria-label={item.label}
+                            className={clsx(
+                              "relative flex items-center gap-3 px-3 py-2 rounded-2xl text-[13px] font-medium transition-all group",
+                              isActive
+                                ? "text-white font-semibold"
+                                : "text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--accent-soft)]"
                             )}
-                          </div>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
+                            title={sidebarCollapsed ? item.label : undefined}
+                          >
+                            {isActive && (
+                              <motion.div
+                                layoutId="activeNavPill"
+                                className="absolute inset-0 bg-[var(--accent)] rounded-2xl z-[-1] shadow-md"
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                              />
+                            )}
+
+                            <div
+                              className={clsx(
+                                "shrink-0 transition-transform group-hover:scale-110",
+                                isActive ? "text-white" : "text-[var(--foreground-muted)]"
+                              )}
+                            >
+                              {item.icon}
+                            </div>
+
+                            {!sidebarCollapsed && (
+                              <div className="flex items-center justify-between w-full truncate">
+                                <span className="truncate">{item.label}</span>
+                                {item.badge !== undefined && (
+                                  <span
+                                    className={clsx(
+                                      "px-2 py-0.5 text-[10px] font-bold rounded-full tabular-nums ml-2 shrink-0 border border-current/10",
+                                      isActive
+                                        ? "bg-white/20 text-white"
+                                        : item.badgeColor || "bg-[var(--accent-soft)] text-[var(--accent)]"
+                                    )}
+                                  >
+                                    {item.badge}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}

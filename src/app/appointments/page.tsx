@@ -7,59 +7,115 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassModal } from "@/components/ui/glass-modal";
-import { motion } from "framer-motion";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
+import { formatDate } from "@/lib/formatDate";
+import { Appointment } from "@/schema/appointmentSchema";
 import {
   Calendar,
   ShieldCheck,
   CreditCard,
   AlertTriangle,
-  Search,
   Plus,
-  Mail,
   MessageSquare,
   CheckCircle2,
   AlertCircle,
-  Clock,
+  FileCheck2,
   Sparkles,
 } from "lucide-react";
-import { mockAppointments } from "@/data/mockAppointments";
-import { Appointment } from "@/schema/appointmentSchema";
 
 export default function AppointmentsPage() {
+  const { appointments, addAppointment, completeAppointment } = useRcmDataStore();
+
   const [activeEligibilityModal, setActiveEligibilityModal] = useState<Appointment | null>(null);
   const [activeChargeModal, setActiveChargeModal] = useState<Appointment | null>(null);
+  const [isNewAppModalOpen, setIsNewAppModalOpen] = useState(false);
+
+  // New Appointment Form State
+  const [newPatientName, setNewPatientName] = useState("");
+  const [newPayerName, setNewPayerName] = useState("Blue Cross Blue Shield");
+  const [newMemberId, setNewMemberId] = useState("");
+  const [newServiceDate, setNewServiceDate] = useState("2026-08-11");
+  const [newTime, setNewTime] = useState("10:00 AM");
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleCreateAppointment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPatientName || !newMemberId) return;
+
+    addAppointment({
+      patientName: newPatientName,
+      providerName: "Dr. Evelyn Vance",
+      payerName: newPayerName,
+      memberId: newMemberId,
+      submittedMemberId: newMemberId,
+      returnedMemberId: newMemberId,
+      eligibilityStatus: "Eligible",
+      workflowStatus: "Scheduled",
+      time: newTime,
+      copayAmount: 20.0,
+      deductibleRemaining: 150.0,
+    });
+
+    showToast(`New appointment created for ${newPatientName}!`);
+    setIsNewAppModalOpen(false);
+    setNewPatientName("");
+    setNewMemberId("");
+  };
+
+  const handleCompleteVisit = (apt: Appointment) => {
+    completeAppointment(apt.id);
+    showToast(`Visit completed for ${apt.patientName}! Auto-generated linked Encounter & Claim on /claims.`);
+  };
 
   return (
     <AppShell>
       <div className="space-y-6 select-none">
-        {/* Header */}
+        {/* Toast Notification Banner */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-[var(--status-success)] text-white font-bold text-xs shadow-2xl flex items-center gap-2 animate-bounce">
+            <CheckCircle2 className="w-4 h-4" /> {toastMessage}
+          </div>
+        )}
+
+        {/* Header (8.18 - Simplified Title) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Pre-Visit Financials & Eligibility Worklist
+                Appointments
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
-                Appointments Worklist
+                Pre-Visit Worklist
               </span>
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">
-              Real-time automated coverage verification 24-48h prior to session + upfront copay collection.
+              Real-time automated coverage verification prior to session + upfront copay collection and visit completion flow.
             </p>
           </div>
+
+          <Button variant="primary" size="sm" onClick={() => setIsNewAppModalOpen(true)}>
+            <Plus className="w-4 h-4" />
+            New Appointment
+          </Button>
         </div>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <KpiCard
-            label="Today's Appointments"
-            value="18 Session"
+            label="Total Appointments"
+            value={`${appointments.length} Sessions`}
             subtitle="100% checked automatically"
             icon={<Calendar className="w-5 h-5" />}
           />
           <KpiCard
             label="Coverage Active"
-            value="16 Verified"
+            value={`${appointments.filter((a) => a.eligibilityStatus === "Eligible").length} Verified`}
             delta="88.8% Active"
             deltaType="increase"
             subtitle="Eligible — In Network"
@@ -67,7 +123,7 @@ export default function AppointmentsPage() {
           />
           <KpiCard
             label="Data Mismatches"
-            value="1 Flagged"
+            value={`${appointments.filter((a) => a.eligibilityStatus === "Mismatch").length} Flagged`}
             delta="Member ID Diff"
             deltaType="decrease"
             subtitle="Inline diff correctable"
@@ -87,7 +143,7 @@ export default function AppointmentsPage() {
         <div className="neu p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-[14px] font-bold text-[var(--foreground)]">
-              Tomorrow's Appointments Financial Worklist
+              Scheduled Appointments Financial Worklist
             </h2>
             <span className="text-[12px] text-[var(--foreground-muted)] font-medium">
               Real-time 270/271 EDI verification active
@@ -95,7 +151,7 @@ export default function AppointmentsPage() {
           </div>
 
           <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)]">
-            {mockAppointments.map((apt) => (
+            {appointments.map((apt) => (
               <div
                 key={apt.id}
                 className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[var(--surface-muted)] transition-colors"
@@ -116,14 +172,25 @@ export default function AppointmentsPage() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  {apt.eligibilityStatus === "Eligible" && (
+                  {apt.workflowStatus === "Completed" ? (
+                    <StatusBadge tone="success" label="Visit Completed (Claim Generated)" />
+                  ) : apt.eligibilityStatus === "Eligible" ? (
                     <StatusBadge tone="success" label="Active Coverage — In Network" />
-                  )}
-                  {apt.eligibilityStatus === "Mismatch" && (
+                  ) : (
                     <StatusBadge tone="critical" label="Member ID Mismatch Flag" />
                   )}
 
                   <div className="flex items-center gap-2">
+                    {apt.workflowStatus !== "Completed" && (
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onClick={() => handleCompleteVisit(apt)}
+                      >
+                        <FileCheck2 className="w-3.5 h-3.5" /> Complete Visit
+                      </Button>
+                    )}
+
                     <Button
                       size="sm"
                       variant="secondary"
@@ -134,11 +201,11 @@ export default function AppointmentsPage() {
 
                     <Button
                       size="sm"
-                      variant="primary"
+                      variant="secondary"
                       onClick={() => setActiveChargeModal(apt)}
                     >
                       <CreditCard className="w-3.5 h-3.5" />
-                      Collect Copay (${apt.copayAmount})
+                      Copay (${apt.copayAmount})
                     </Button>
                   </div>
                 </div>
@@ -147,7 +214,88 @@ export default function AppointmentsPage() {
           </div>
         </div>
 
-        {/* Eligibility Modal with Inline Field Diff */}
+        {/* New Appointment Modal (Stage 9 Creation Flow) */}
+        <GlassModal
+          isOpen={isNewAppModalOpen}
+          onClose={() => setIsNewAppModalOpen(false)}
+          title="Create New Appointment"
+          description="Schedule a new session with real-time pre-visit eligibility verification"
+        >
+          <form onSubmit={handleCreateAppointment} className="space-y-4 text-xs">
+            <div>
+              <label className="block font-bold text-[var(--foreground)] mb-1">Patient Name *</label>
+              <input
+                type="text"
+                required
+                value={newPatientName}
+                onChange={(e) => setNewPatientName(e.target.value)}
+                placeholder="e.g. Elena Rostova"
+                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-[13px] text-[var(--foreground)] bg-transparent border-none outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-bold text-[var(--foreground)] mb-1">Insurance Payer</label>
+                <select
+                  value={newPayerName}
+                  onChange={(e) => setNewPayerName(e.target.value)}
+                  className="w-full neu-pressed px-3 py-2 rounded-xl text-[12px] text-[var(--foreground)] bg-transparent border-none outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                >
+                  <option value="Blue Cross Blue Shield">Blue Cross Blue Shield</option>
+                  <option value="Aetna Behavioral Health">Aetna Behavioral Health</option>
+                  <option value="United Healthcare">United Healthcare</option>
+                  <option value="Cigna Health">Cigna Health</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-[var(--foreground)] mb-1">Member ID *</label>
+                <input
+                  type="text"
+                  required
+                  value={newMemberId}
+                  onChange={(e) => setNewMemberId(e.target.value)}
+                  placeholder="e.g. BCBS-994120"
+                  className="w-full neu-pressed px-3.5 py-2 rounded-xl text-[13px] text-[var(--foreground)] bg-transparent border-none outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-bold text-[var(--foreground)] mb-1">Service Date</label>
+                <input
+                  type="date"
+                  value={newServiceDate}
+                  onChange={(e) => setNewServiceDate(e.target.value)}
+                  className="w-full neu-pressed px-3.5 py-2 rounded-xl text-[13px] text-[var(--foreground)] bg-transparent border-none outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-[var(--foreground)] mb-1">Time Slot</label>
+                <input
+                  type="text"
+                  value={newTime}
+                  onChange={(e) => setNewTime(e.target.value)}
+                  className="w-full neu-pressed px-3.5 py-2 rounded-xl text-[13px] text-[var(--foreground)] bg-transparent border-none outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-[var(--border)]">
+              <Button type="button" variant="secondary" size="sm" onClick={() => setIsNewAppModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" size="sm">
+                <Plus className="w-3.5 h-3.5" /> Schedule & Verify
+              </Button>
+            </div>
+          </form>
+        </GlassModal>
+
+        {/* Eligibility Modal */}
         <GlassModal
           isOpen={!!activeEligibilityModal}
           onClose={() => setActiveEligibilityModal(null)}
@@ -201,7 +349,7 @@ export default function AppointmentsPage() {
                   variant="primary"
                   size="sm"
                   onClick={() => {
-                    alert("Corrected Member ID updated in EHR & RCM patient file!");
+                    showToast("Corrected Member ID updated in EHR & RCM patient file!");
                     setActiveEligibilityModal(null);
                   }}
                 >
@@ -239,10 +387,16 @@ export default function AppointmentsPage() {
               <div className="space-y-2">
                 <label className="text-[12px] font-bold text-[var(--foreground)]">Collection Delivery Method:</label>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => alert("Payment link sent via SMS/Text!")}>
+                  <Button variant="secondary" size="sm" onClick={() => {
+                    showToast("Payment link sent via SMS/Text!");
+                    setActiveChargeModal(null);
+                  }}>
                     <MessageSquare className="w-3.5 h-3.5" /> Send Pay-by-Link (SMS)
                   </Button>
-                  <Button variant="primary" size="sm" onClick={() => alert("Charged card on file successfully!")}>
+                  <Button variant="primary" size="sm" onClick={() => {
+                    showToast("Charged card on file successfully!");
+                    setActiveChargeModal(null);
+                  }}>
                     <CreditCard className="w-3.5 h-3.5" /> Charge Card on File
                   </Button>
                 </div>

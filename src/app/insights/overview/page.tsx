@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { mockMonthlyRevenueData, mockPayerPerformance, mockContractVariances } from "@/data/mockAnalytics";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -31,16 +32,34 @@ import {
   Zap,
   Activity,
   PieChart as PieIcon,
-  Layers,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function OverviewPage() {
+  const { claims, denialClusters } = useRcmDataStore();
   const pieColors = ["#1f2e4a", "#343a40", "#6c757d", "#ced4da"];
   const [isMounted, setIsMounted] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Dynamic KPI Calculations (8.3)
+  const totalBilled = claims.reduce((sum, c) => sum + (c.billedAmount || c.submittedAmount || 0), 0);
+  const totalPaid = claims.reduce((sum, c) => sum + (c.paidAmount || 0), 0);
+  const netCollectionRate = totalBilled > 0 ? ((totalPaid / totalBilled) * 100).toFixed(1) : "98.4";
+
+  const nonDeniedClaims = claims.filter((c) => c.status !== "Denied").length;
+  const cleanClaimRate = claims.length > 0 ? ((nonDeniedClaims / claims.length) * 100).toFixed(1) : "94.2";
+
+  const deniedClaims = claims.filter((c) => c.status === "Denied").length;
+  const denialRate = claims.length > 0 ? ((deniedClaims / claims.length) * 100).toFixed(1) : "4.8";
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   const pieData = mockPayerPerformance.map((p) => ({
     name: p.payerName === "Blue Cross Blue Shield" ? "BCBS" : p.payerName === "Aetna Behavioral Health" ? "Aetna" : p.payerName === "United Healthcare" ? "UHC" : "Cigna",
@@ -69,7 +88,14 @@ export default function OverviewPage() {
         animate="show"
         className="space-y-6 select-none"
       >
-        {/* Top Header */}
+        {/* Toast Notification Banner */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-[var(--accent)] text-white font-bold text-xs shadow-2xl flex items-center gap-2 animate-bounce">
+            <CheckCircle2 className="w-4 h-4" /> {toastMessage}
+          </div>
+        )}
+
+        {/* Top Header (8.18 - Simplified Title) */}
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <p className="text-xs font-bold text-[var(--accent)] uppercase tracking-wider mb-1 flex items-center gap-1.5">
@@ -77,10 +103,10 @@ export default function OverviewPage() {
             </p>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Revenue Cycle Control Tower & Executive Overview
+                Overview
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
-                Executive Insights Engine
+                Executive Control Tower
               </span>
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">
@@ -92,13 +118,13 @@ export default function OverviewPage() {
             <Link href="/worklist">
               <Button variant="secondary" size="sm">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
-                <span>Action Items Queue (30 Exceptions)</span>
+                <span>Action Items Queue ({denialClusters.length} Active Clusters)</span>
               </Button>
             </Link>
           </div>
         </motion.div>
 
-        {/* Auto-Generated Revenue Intelligence Callouts (PRD §8.7.1) */}
+        {/* Auto-Generated Revenue Intelligence Callouts */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="neu p-5 border border-white/60 bg-gradient-to-br from-[var(--canvas)] to-[var(--surface-muted)] space-y-2">
             <div className="flex items-center justify-between">
@@ -125,11 +151,11 @@ export default function OverviewPage() {
           </div>
         </motion.div>
 
-        {/* Master Top-Line KPI Strip */}
+        {/* Master Top-Line KPI Strip (8.3 - Dynamic Expressions) */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <KpiCard
             label="Net Collection Rate"
-            value="98.4%"
+            value={`${netCollectionRate}%`}
             delta="+2.1%"
             deltaType="increase"
             subtitle="Collectable revenue"
@@ -137,7 +163,7 @@ export default function OverviewPage() {
           />
           <KpiCard
             label="Clean Claim Rate"
-            value="94.2%"
+            value={`${cleanClaimRate}%`}
             delta="+1.5%"
             deltaType="increase"
             subtitle="First pass success"
@@ -145,7 +171,7 @@ export default function OverviewPage() {
           />
           <KpiCard
             label="Denial Rate"
-            value="4.8%"
+            value={`${denialRate}%`}
             delta="-0.9%"
             deltaType="increase"
             subtitle="Clustered by root cause"
@@ -169,8 +195,8 @@ export default function OverviewPage() {
           />
           <KpiCard
             label="Touchless Claim %"
-            value="94.2%"
-            delta="90% Target Met"
+            value={`${cleanClaimRate}%`}
+            delta="Target: 90%"
             deltaType="increase"
             subtitle="Zero human touch"
             icon={<Zap className="w-4 h-4" />}
@@ -316,7 +342,7 @@ export default function OverviewPage() {
                     </div>
                   </div>
 
-                  <Button size="sm" variant="secondary" onClick={() => alert(`Dispute filed for ${varItem.claimId} under contract clause!`)}>
+                  <Button size="sm" variant="secondary" onClick={() => showToast(`Dispute filed for ${varItem.claimId} under contract clause!`)}>
                     File Dispute
                   </Button>
                 </div>

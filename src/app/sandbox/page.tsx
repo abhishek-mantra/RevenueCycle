@@ -271,7 +271,6 @@ export default function SandboxPage() {
           selectedIds={selectedIds}
           onSelectRow={handleSelectRow}
           onSelectAll={handleSelectAll}
-          onRowClick={(row) => console.log("Clicked row", row)}
         />
       </section>
 

@@ -3,6 +3,7 @@
 import React from "react";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
+import { AiAssistantPanel } from "./ai-assistant-panel";
 import { useAppStore } from "@/store/useAppStore";
 import { clsx } from "clsx";
 
@@ -24,6 +25,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       {/* Floating Glass Navigation */}
       <Sidebar />
       <Topbar />
+
+      {/* Persistent AI Assistant Slide-Out Panel */}
+      <AiAssistantPanel />
 
       {/* Main Content Viewport */}
       <main

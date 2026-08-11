@@ -61,9 +61,9 @@ export const KpiCard: React.FC<KpiCardProps> = ({
           {value}
         </div>
         {delta && (
-          <div className={clsx("inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-tight border", getDeltaTone())}>
+          <div className={clsx("inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-tight whitespace-nowrap shrink-0 border", getDeltaTone())}>
             {getDeltaIcon()}
-            <span>{delta}</span>
+            <span className="whitespace-nowrap">{delta}</span>
           </div>
         )}
       </div>

@@ -7,8 +7,8 @@ import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { GlassModal } from "@/components/ui/glass-modal";
-import { mockClaims } from "@/data/mockClaims";
-import { mockDenialClusters } from "@/data/mockDenials";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
+import { formatDate } from "@/lib/formatDate";
 import {
   FileText,
   Clock,
@@ -16,28 +16,63 @@ import {
   AlertTriangle,
   ArrowLeft,
   CheckCircle2,
-  AlertCircle,
   RotateCw,
   Send,
-  UserCheck,
-  Building2,
-  Calendar,
-  Layers,
+  AlertCircle,
 } from "lucide-react";
 
 export default function ClaimDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const claimIdParam = resolvedParams.id;
+  const { claims, denialClusters, updateClaimStatus } = useRcmDataStore();
 
-  const claim = mockClaims.find((c) => c.claimId === claimIdParam || c.id === claimIdParam) || mockClaims[0];
-  const parentCluster = mockDenialClusters.find((c) => c.claims.some((d) => d.claimId === claim.claimId));
-  const relatedDenial = parentCluster?.claims.find((d) => d.claimId === claim.claimId);
+  const claim = claims.find((c) => c.claimId === claimIdParam || c.id === claimIdParam);
+  const parentCluster = claim ? denialClusters.find((c) => c.claims.some((d) => d.claimId === claim.claimId)) : null;
 
   const [isResubmitModalOpen, setIsResubmitModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // 8.4 - Clean Not Found State if claim matching ID does not exist
+  if (!claim) {
+    return (
+      <AppShell>
+        <div className="max-w-md mx-auto my-12 neu p-8 text-center space-y-4 select-none bg-[var(--surface)]">
+          <div className="w-12 h-12 rounded-full bg-[var(--status-critical-bg)] text-[var(--status-critical)] flex items-center justify-center mx-auto">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-[18px] font-extrabold text-[var(--foreground)]">Claim Not Found</h2>
+            <p className="text-[12px] text-[var(--foreground-muted)] font-medium mt-1">
+              No claim record matching ID <span className="font-mono text-[var(--foreground)]">{claimIdParam}</span> could be found.
+            </p>
+          </div>
+          <Link href="/claims">
+            <Button variant="primary" size="sm" className="w-full justify-center">
+              <ArrowLeft className="w-4 h-4" /> Return to Claims Tracker
+            </Button>
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const handleResubmit = () => {
+    updateClaimStatus(claim.claimId, "InAdjudication");
+    setToastMessage(`Claim ${claim.claimId} corrected and re-submitted to ${claim.payerName}! Status updated to In Adjudication.`);
+    setIsResubmitModalOpen(false);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   return (
     <AppShell>
       <div className="space-y-6 select-none">
+        {/* Toast Notification Banner */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-[var(--status-success)] text-white font-bold text-xs shadow-2xl flex items-center gap-2 animate-bounce">
+            <CheckCircle2 className="w-4 h-4" /> {toastMessage}
+          </div>
+        )}
+
         {/* Header Breadcrumb */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -58,7 +93,7 @@ export default function ClaimDetailPage({ params }: { params: Promise<{ id: stri
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium">
               Patient: <strong className="text-[var(--foreground)]">{claim.patientName}</strong> • Payer:{" "}
-              <strong className="text-[var(--foreground)]">{claim.payerName}</strong> • Service Date: {claim.serviceDate}
+              <strong className="text-[var(--foreground)]">{claim.payerName}</strong> • Service Date: {formatDate(claim.serviceDate)}
             </p>
           </div>
 
@@ -161,7 +196,7 @@ export default function ClaimDetailPage({ params }: { params: Promise<{ id: stri
               </div>
               <div className="flex justify-between py-1 border-b border-[var(--border)]">
                 <span className="text-[var(--foreground-muted)] font-medium">Functional Ack 999:</span>
-                <span className="font-bold text-[var(--status-success)]">Accepted (2026-08-01)</span>
+                <span className="font-bold text-[var(--status-success)]">Accepted ({formatDate(claim.serviceDate)})</span>
               </div>
               <div className="flex justify-between py-1 border-b border-[var(--border)]">
                 <span className="text-[var(--foreground-muted)] font-medium">277 Claim Status:</span>
@@ -201,10 +236,7 @@ export default function ClaimDetailPage({ params }: { params: Promise<{ id: stri
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => {
-                  alert(`Claim ${claim.claimId} corrected and re-submitted to ${claim.payerName}!`);
-                  setIsResubmitModalOpen(false);
-                }}
+                onClick={handleResubmit}
               >
                 <Send className="w-3.5 h-3.5 mr-1" /> Approve & Transmit 837P
               </Button>

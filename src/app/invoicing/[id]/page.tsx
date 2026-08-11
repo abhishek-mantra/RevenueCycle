@@ -7,32 +7,68 @@ import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { GlassModal } from "@/components/ui/glass-modal";
-import { mockInvoices } from "@/data/mockInvoices";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
+import { formatDate } from "@/lib/formatDate";
 import {
   Receipt,
   DollarSign,
   ArrowLeft,
   UserCheck,
   CreditCard,
-  Send,
   CheckCircle2,
-  Calendar,
   ShieldCheck,
+  AlertCircle,
 } from "lucide-react";
 
 export default function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const invoiceIdParam = resolvedParams.id;
+  const { invoices, recordInvoicePayment } = useRcmDataStore();
 
-  const invoice =
-    mockInvoices.find((i) => i.id === invoiceIdParam || i.invoiceNumber === invoiceIdParam) ||
-    mockInvoices[0];
-
+  const invoice = invoices.find((i) => i.id === invoiceIdParam || i.invoiceNumber === invoiceIdParam);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  if (!invoice) {
+    return (
+      <AppShell>
+        <div className="max-w-md mx-auto my-12 neu p-8 text-center space-y-4 select-none bg-[var(--surface)]">
+          <div className="w-12 h-12 rounded-full bg-[var(--status-critical-bg)] text-[var(--status-critical)] flex items-center justify-center mx-auto">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <h2 className="text-[18px] font-extrabold text-[var(--foreground)]">Invoice Not Found</h2>
+            <p className="text-[12px] text-[var(--foreground-muted)] font-medium mt-1">
+              No invoice matching ID <span className="font-mono text-[var(--foreground)]">{invoiceIdParam}</span> exists.
+            </p>
+          </div>
+          <Link href="/invoicing">
+            <Button variant="primary" size="sm" className="w-full justify-center">
+              <ArrowLeft className="w-4 h-4" /> Return to Invoicing
+            </Button>
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const handleCharge = () => {
+    recordInvoicePayment(invoice.id, invoice.balanceDue, "Card");
+    setToastMessage(`Successfully processed payment of $${invoice.balanceDue.toFixed(2)} for ${invoice.patientName}! Sealed receipt issued.`);
+    setIsPayModalOpen(false);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   return (
     <AppShell>
       <div className="space-y-6 select-none">
+        {/* Toast Notification Banner */}
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-[var(--status-success)] text-white font-bold text-xs shadow-2xl flex items-center gap-2 animate-bounce">
+            <CheckCircle2 className="w-4 h-4" /> {toastMessage}
+          </div>
+        )}
+
         {/* Header Breadcrumb */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -53,15 +89,21 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium">
               Patient: <strong className="text-[var(--foreground)]">{invoice.patientName}</strong> • Due Date:{" "}
-              {invoice.dueDate} • Created: {invoice.createdDate || invoice.issueDate}
+              {formatDate(invoice.dueDate)} • Issued: {formatDate(invoice.issuedDate)}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            {invoice.status !== "Paid" && (
+            {invoice.balanceDue > 0 ? (
               <Button variant="primary" size="sm" onClick={() => setIsPayModalOpen(true)}>
                 <CreditCard className="w-3.5 h-3.5 mr-1" /> Charge Card-on-File
               </Button>
+            ) : (
+              <Link href={`/invoicing/${invoice.id}/receipt`}>
+                <Button variant="secondary" size="sm">
+                  View Sealed Receipt
+                </Button>
+              </Link>
             )}
           </div>
         </div>
@@ -71,7 +113,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           <KpiCard
             label="Total Gross Service Charge"
             value={`$${invoice.totalAmount.toFixed(2)}`}
-            subtitle="Provider Charge Amount"
+            subtitle="Provider Charge Schedule"
             icon={<DollarSign className="w-5 h-5" />}
           />
           <KpiCard
@@ -84,7 +126,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
           />
           <KpiCard
             label="Patient Responsibility"
-            value={`$${(invoice.patientResponsibility ?? invoice.totalAmount).toFixed(2)}`}
+            value={`$${(invoice.totalAmount - (invoice.insurancePaid ?? 0)).toFixed(2)}`}
             delta={invoice.status === "Paid" ? "Collected" : "Balance Pending"}
             deltaType={invoice.status === "Paid" ? "increase" : "neutral"}
             subtitle="Decoupled AR State"
@@ -108,20 +150,22 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
             </h3>
 
             <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)]">
-              {(invoice.items || []).map((item, idx) => (
+              {(invoice.lineItems || invoice.items || [
+                { description: "Behavioral Health Session", charge: invoice.totalAmount, patientDue: invoice.totalAmount }
+              ]).map((item, idx) => (
                 <div key={idx} className="p-4 flex items-center justify-between text-xs">
                   <div className="space-y-1">
                     <div className="font-bold text-[var(--foreground)]">
-                      CPT {item.cpt} — {item.description}
+                      {item.description}
                     </div>
                     <div className="text-[var(--foreground-muted)] font-medium">
-                      DOS: {item.dos} | Line Charge: ${item.charge.toFixed(2)} | Ins. Covered: ${item.insuranceCovered.toFixed(2)}
+                      Line Charge: ${(item.charge || item.patientDue).toFixed(2)}
                     </div>
                   </div>
 
                   <div className="text-right">
                     <div className="font-extrabold text-sm text-[var(--accent)] tabular-nums">
-                      ${item.patientDue.toFixed(2)}
+                      ${(item.patientDue || item.charge).toFixed(2)}
                     </div>
                     <span className="text-[10px] font-bold text-[var(--foreground-muted)]">Patient Due</span>
                   </div>
@@ -146,7 +190,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               </div>
               <div className="flex justify-between py-1 border-b border-[var(--border)]">
                 <span className="text-[var(--foreground-muted)] font-medium">Card-on-File:</span>
-                <span className="font-mono text-[var(--foreground)]">Visa ending in •••• 4092</span>
+                <span className="font-mono text-[var(--foreground)]">Visa ending in •••• 4242</span>
               </div>
             </div>
           </div>
@@ -167,7 +211,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               </div>
               <div className="flex justify-between text-[var(--foreground-muted)]">
                 <span>Processing Method:</span>
-                <span className="font-bold text-[var(--accent)]">Stripe Card-on-File (Visa •••• 4092)</span>
+                <span className="font-bold text-[var(--accent)]">Card-on-File (Visa •••• 4242)</span>
               </div>
             </div>
 
@@ -178,10 +222,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => {
-                  alert(`Successfully processed payment of $${invoice.balanceDue.toFixed(2)} for ${invoice.patientName}!`);
-                  setIsPayModalOpen(false);
-                }}
+                onClick={handleCharge}
               >
                 <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Charge ${invoice.balanceDue.toFixed(2)}
               </Button>

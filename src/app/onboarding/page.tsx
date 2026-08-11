@@ -1,21 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
-import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { GlassModal } from "@/components/ui/glass-modal";
 import { motion } from "framer-motion";
 import {
   Upload,
   FileSpreadsheet,
-  Building2,
   CheckCircle2,
-  AlertTriangle,
   History,
-  ShieldCheck,
   ArrowRight,
 } from "lucide-react";
 
@@ -31,12 +26,12 @@ export default function OnboardingPage() {
   return (
     <AppShell>
       <div className="space-y-6 select-none">
-        {/* Header */}
+        {/* Header (8.18 - Simplified Title) */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-[22px] font-extrabold tracking-tight text-[var(--foreground)]">
-                Migration & Shadow Mode Import
+                Onboarding
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
                 Legacy System Import
@@ -89,14 +84,17 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <Button size="sm" variant="secondary" onClick={() => alert("Viewing imported shadow claims in worklist")}>
-                View Imported Claims →
-              </Button>
+              {/* 8.5 - Navigate to real worklist route instead of alert */}
+              <Link href="/worklist">
+                <Button size="sm" variant="secondary">
+                  View Imported Claims <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </Link>
             </motion.div>
           )}
         </div>
 
-        {/* Historical Superbill Reconstruction Path (PRD §8.0.2) */}
+        {/* Historical Superbill Reconstruction Path */}
         <div className="neu p-6 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-[15px] font-bold text-[var(--foreground)] flex items-center gap-2">
@@ -110,9 +108,12 @@ export default function OnboardingPage() {
             Generate itemized superbills for sessions documented before migration so clients seeking out-of-network reimbursement are never left stranded.
           </p>
 
-          <Button size="sm" variant="secondary" onClick={() => alert("Opened Historical Superbill Generator")}>
-            Generate Historical Superbill
-          </Button>
+          {/* 8.5 - Link to real superbill generator page instead of alert */}
+          <Link href="/onboarding/superbill-generator">
+            <Button size="sm" variant="secondary">
+              Generate Historical Superbill
+            </Button>
+          </Link>
         </div>
       </div>
     </AppShell>
