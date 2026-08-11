@@ -56,14 +56,14 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         )}
       </div>
 
-      <div className="flex items-baseline justify-between gap-3 mt-1">
-        <div className="text-[32px] font-black tracking-tight text-[var(--foreground)] tabular-nums">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mt-1 min-w-0">
+        <div className="text-[26px] xl:text-[28px] font-black tracking-tight text-[var(--foreground)] tabular-nums shrink-0">
           {value}
         </div>
         {delta && (
-          <div className={clsx("inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-tight whitespace-nowrap shrink-0 border", getDeltaTone())}>
+          <div className={clsx("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-semibold tracking-tight whitespace-nowrap shrink-0 border max-w-full truncate", getDeltaTone())}>
             {getDeltaIcon()}
-            <span className="whitespace-nowrap">{delta}</span>
+            <span className="whitespace-nowrap truncate">{delta}</span>
           </div>
         )}
       </div>

@@ -23,6 +23,11 @@ import {
   Zap,
   ShieldAlert,
   ChevronDown,
+  AlertTriangle,
+  AlertCircle,
+  FileCode,
+  Radio,
+  Layers,
 } from "lucide-react";
 
 interface NavItem {
@@ -66,7 +71,13 @@ export const Sidebar: React.FC = () => {
     {
       title: "ACTION ITEMS",
       items: [
-        { label: "Action Items Queue", href: "/worklist", icon: <ShieldAlert className="w-4 h-4" />, badge: 30, badgeColor: "bg-[var(--status-critical-bg)] text-[var(--status-critical)]" },
+        { label: "All Action Items Hub", href: "/worklist", icon: <ShieldAlert className="w-4 h-4" />, badge: 30, badgeColor: "bg-[var(--status-critical-bg)] text-[var(--status-critical)]" },
+        { label: "Denial Management", href: "/worklist/denials", icon: <AlertTriangle className="w-4 h-4" />, badge: 12 },
+        { label: "Import Errors", href: "/worklist/import-errors", icon: <AlertCircle className="w-4 h-4" />, badge: 2 },
+        { label: "Payer Mappings", href: "/worklist/payer-mapping", icon: <Layers className="w-4 h-4" />, badge: 4 },
+        { label: "Submission Errors", href: "/worklist/submission-errors", icon: <FileCode className="w-4 h-4" />, badge: 4 },
+        { label: "Payer Rejections", href: "/worklist/rejections", icon: <ShieldAlert className="w-4 h-4" />, badge: 4 },
+        { label: "EDI / ERA Enrollments", href: "/worklist/edi-era", icon: <Radio className="w-4 h-4" />, badge: 4 },
       ],
     },
     {

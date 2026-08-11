@@ -57,7 +57,7 @@ function WorklistContent({ defaultTab }: any) {
         </div>
 
         {/* Tab Sub-Navigation Bar */}
-        <div className="neu p-1.5 rounded-2xl flex flex-wrap items-center gap-1 border border-white/60 bg-[var(--surface)]">
+        <div className="neu p-1.5 rounded-2xl flex flex-wrap items-center gap-1 border border-white/60 bg-[var(--surface)] overflow-x-auto custom-scrollbar">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
