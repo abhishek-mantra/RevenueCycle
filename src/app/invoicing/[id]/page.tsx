@@ -88,7 +88,7 @@ export default function InvoiceDetailPage({ params }: { params: Promise<{ id: st
               />
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium">
-              Patient: <strong className="text-[var(--foreground)]">{invoice.patientName}</strong> • Due Date:{" "}
+              Patient: <Link href={`/patients/${invoice.patientName === "Sarah Jenkins" ? "PAT-101" : invoice.patientName === "Michael Chang" ? "PAT-102" : "PAT-103"}`} className="text-[var(--foreground)] font-bold hover:text-[var(--accent)] hover:underline transition-colors">{invoice.patientName}</Link> • Due Date:{" "}
               {formatDate(invoice.dueDate)} • Issued: {formatDate(invoice.issuedDate)}
             </p>
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -162,7 +163,13 @@ export default function AppointmentsPage() {
                   </div>
                   <div>
                     <h3 className="text-[15px] font-bold text-[var(--foreground)]">
-                      {apt.patientName} — <span className="text-[var(--foreground-muted)] font-medium">{apt.providerName}</span>
+                      <Link
+                        href={`/patients/${apt.patientName === "Sarah Jenkins" ? "PAT-101" : apt.patientName === "Michael Chang" ? "PAT-102" : "PAT-103"}`}
+                        className="hover:text-[var(--accent)] hover:underline transition-colors"
+                      >
+                        {apt.patientName}
+                      </Link>{" "}
+                      — <span className="text-[var(--foreground-muted)] font-medium">{apt.providerName}</span>
                     </h3>
                     <div className="flex items-center gap-3 text-xs text-[var(--foreground-muted)] font-medium mt-0.5">
                       <span>{apt.payerName}</span>

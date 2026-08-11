@@ -279,7 +279,7 @@ export default function EncountersPage() {
                       />
                     </div>
                     <h3 className="text-[17px] font-bold text-[var(--foreground)]">
-                      <Link href={`/encounters/${enc.id}`} className="hover:text-[var(--accent)] transition-colors">
+                      <Link href={`/patients/${enc.patientName === "Sarah Jenkins" ? "PAT-101" : enc.patientName === "Michael Chang" ? "PAT-102" : "PAT-103"}`} className="hover:text-[var(--accent)] hover:underline transition-colors font-bold text-[var(--foreground)]">
                         {enc.patientName}
                       </Link>{" "}
                       — <span className="text-[var(--foreground-muted)] font-medium">{enc.providerName}</span>

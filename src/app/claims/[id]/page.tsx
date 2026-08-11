@@ -101,7 +101,7 @@ export default function ClaimDetailPage({ params }: { params: Promise<{ id: stri
               />
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium">
-              Patient: <strong className="text-[var(--foreground)]">{claim.patientName}</strong> • Payer:{" "}
+              Patient: <Link href={`/patients/${claim.patientName === "Sarah Jenkins" ? "PAT-101" : claim.patientName === "Michael Chang" ? "PAT-102" : "PAT-103"}`} className="text-[var(--foreground)] font-bold hover:text-[var(--accent)] hover:underline transition-colors">{claim.patientName}</Link> • Payer:{" "}
               <strong className="text-[var(--foreground)]">{claim.payerName}</strong> • Service Date: {formatDate(claim.serviceDate)}
             </p>
           </div>
