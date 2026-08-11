@@ -88,7 +88,10 @@ export const Sidebar: React.FC = () => {
     {
       title: "AUTOMATION CONFIG",
       items: [
-        { label: "Automation Rules", href: "/automation", icon: <Sliders className="w-4 h-4" /> },
+        { label: "Scrub Rules Engine", href: "/automation/rules", icon: <Sliders className="w-4 h-4" /> },
+        { label: "Insurance Intake", href: "/automation/insurance-intake", icon: <FileCheck2 className="w-4 h-4" /> },
+        { label: "Patient Flow", href: "/automation/patient-flow", icon: <Zap className="w-4 h-4" /> },
+        { label: "Patient Statements", href: "/automation/patient-statements", icon: <Receipt className="w-4 h-4" /> },
       ],
     },
     {
