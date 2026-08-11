@@ -24,13 +24,22 @@ import {
 export default function ClaimDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const claimIdParam = resolvedParams.id;
-  const { claims, denialClusters, updateClaimStatus } = useRcmDataStore();
+  const { claims, denialClusters, updateClaimStatus, addClaimNote } = useRcmDataStore();
+  const [newNoteText, setNewNoteText] = useState("");
 
   const claim = claims.find((c) => c.claimId === claimIdParam || c.id === claimIdParam);
   const parentCluster = claim ? denialClusters.find((c) => c.claims.some((d) => d.claimId === claim.claimId)) : null;
 
   const [isResubmitModalOpen, setIsResubmitModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const handleAddNote = () => {
+    if (!newNoteText.trim() || !claim) return;
+    addClaimNote(claim.id, newNoteText.trim());
+    setNewNoteText("");
+    setToastMessage("Internal note added to claim activity log.");
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   // 8.4 - Clean Not Found State if claim matching ID does not exist
   if (!claim) {
@@ -205,6 +214,46 @@ export default function ClaimDetailPage({ params }: { params: Promise<{ id: stri
               <div className="flex justify-between py-1 border-b border-[var(--border)]">
                 <span className="text-[var(--foreground-muted)] font-medium">Source Record:</span>
                 <span className="font-mono text-[var(--foreground)]">EHR Signed Handoff</span>
+              </div>
+            </div>
+
+            {/* Internal Biller Notes & Activity Log (11.4) */}
+            <div className="pt-4 border-t border-[var(--border)] space-y-3">
+              <h4 className="text-[13px] font-extrabold text-[var(--foreground)] flex items-center justify-between">
+                <span>Internal Biller Notes</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-bold">
+                  {(claim.notes || []).length} Notes
+                </span>
+              </h4>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newNoteText}
+                  onChange={(e) => setNewNoteText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddNote()}
+                  placeholder="Add internal biller note..."
+                  className="w-full neu-pressed px-3 py-1.5 rounded-xl text-xs text-[var(--foreground)] bg-transparent outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                />
+                <Button size="sm" variant="primary" onClick={handleAddNote} disabled={!newNoteText.trim()}>
+                  <Send className="w-3 h-3" />
+                </Button>
+              </div>
+
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {(claim.notes || []).length === 0 ? (
+                  <p className="text-[11px] text-[var(--foreground-muted)] italic">No notes added yet for this claim.</p>
+                ) : (
+                  (claim.notes || []).map((note) => (
+                    <div key={note.id} className="p-2.5 neu-pressed rounded-xl text-xs space-y-1 bg-[var(--surface-muted)]">
+                      <div className="flex justify-between items-center text-[10px] text-[var(--foreground-muted)] font-bold">
+                        <span>{note.author}</span>
+                        <span>{note.timestamp}</span>
+                      </div>
+                      <p className="text-[11.5px] text-[var(--foreground)] font-medium leading-tight">{note.text}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

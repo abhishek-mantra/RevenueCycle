@@ -6,7 +6,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
-import { mockEncounters } from "@/data/mockEncounters";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import {
   FileCheck2,
   DollarSign,
@@ -18,15 +18,36 @@ import {
   Layers,
   Sparkles,
   Receipt,
+  AlertCircle,
 } from "lucide-react";
 
 export default function EncounterDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const encounterIdParam = resolvedParams.id;
+  const { encounters } = useRcmDataStore();
 
-  const encounter =
-    mockEncounters.find((e) => e.id === encounterIdParam || e.encounterId === encounterIdParam) ||
-    mockEncounters[0];
+  const encounter = encounters.find(
+    (e) => e.id === encounterIdParam || e.encounterId === encounterIdParam
+  );
+
+  if (!encounter) {
+    return (
+      <AppShell>
+        <div className="max-w-xl mx-auto py-16 text-center space-y-4">
+          <div className="neu p-8 rounded-3xl bg-[var(--surface)] space-y-4">
+            <AlertCircle className="w-12 h-12 text-[var(--status-critical)] mx-auto" />
+            <h2 className="text-[20px] font-extrabold text-[var(--foreground)]">Encounter Record Not Found</h2>
+            <p className="text-xs text-[var(--foreground-muted)] font-medium">
+              No matching clinical encounter found for ID: <span className="font-mono font-bold">{encounterIdParam}</span>
+            </p>
+            <Link href="/encounters">
+              <Button size="sm">Return to Encounters Queue</Button>
+            </Link>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>

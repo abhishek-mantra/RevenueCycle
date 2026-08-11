@@ -13,7 +13,28 @@ export default function InvoiceReceiptPage({ params }: { params: Promise<{ id: s
   const invoiceIdParam = resolvedParams.id;
   const { invoices } = useRcmDataStore();
 
-  const invoice = invoices.find((inv) => inv.id === invoiceIdParam || inv.invoiceNumber === invoiceIdParam) || invoices[0];
+  const invoice = invoices.find((inv) => inv.id === invoiceIdParam || inv.invoiceNumber === invoiceIdParam);
+
+  if (!invoice) {
+    return (
+      <AppShell>
+        <div className="max-w-xl mx-auto py-16 text-center space-y-4">
+          <div className="neu p-8 rounded-3xl bg-[var(--surface)] space-y-4 select-none">
+            <Receipt className="w-12 h-12 text-[var(--status-warning)] mx-auto" />
+            <h2 className="text-[20px] font-extrabold text-[var(--foreground)]">Receipt Not Found</h2>
+            <p className="text-xs text-[var(--foreground-muted)] font-medium">
+              No matching invoice or payment receipt found for ID: <span className="font-mono font-bold">{invoiceIdParam}</span>
+            </p>
+            <Link href="/invoicing">
+              <button className="px-4 py-2 rounded-xl bg-[var(--accent)] text-white font-bold text-xs hover:bg-[var(--accent-hover)] transition-all cursor-pointer">
+                Return to Invoicing
+              </button>
+            </Link>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
   const receipt = invoice?.receipts?.[0] || {
     receiptNumber: `RCP-2026-${Math.floor(1000 + Math.random() * 9000)}`,
     paymentDate: invoice?.issuedDate || "2026-08-04",

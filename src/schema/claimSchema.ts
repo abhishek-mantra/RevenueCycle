@@ -1,5 +1,20 @@
 import { z } from "zod";
 
+export const ClaimNoteSchema = z.object({
+  id: z.string(),
+  author: z.string(),
+  timestamp: z.string(),
+  text: z.string(),
+});
+export type ClaimNote = z.infer<typeof ClaimNoteSchema>;
+
+export const ContractualAdjustmentSchema = z.object({
+  reasonCode: z.string(),
+  amount: z.number(),
+  note: z.string(),
+});
+export type ContractualAdjustment = z.infer<typeof ContractualAdjustmentSchema>;
+
 export const ClaimSchema = z.object({
   id: z.string(),           // canonical claim ID (e.g. "CLM-2026-8812")
   claimId: z.string(),      // canonical payer-facing display ID (e.g. "CLM-2026-8812")
@@ -18,6 +33,8 @@ export const ClaimSchema = z.object({
   acknowledged: z.boolean().optional(),
   timelyDaysRemaining: z.number().optional(),
   source: z.enum(["native", "imported"]).optional(),
+  notes: z.array(ClaimNoteSchema).optional(),
+  adjustmentsList: z.array(ContractualAdjustmentSchema).optional(),
 });
 
 export type Claim = z.infer<typeof ClaimSchema>;

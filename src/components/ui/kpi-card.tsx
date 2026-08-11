@@ -31,6 +31,8 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   };
 
   const getDeltaIcon = () => {
+    if (delta && delta.startsWith("-")) return <TrendingDown className="w-3.5 h-3.5" />;
+    if (delta && delta.startsWith("+")) return <TrendingUp className="w-3.5 h-3.5" />;
     if (deltaType === "increase") return <TrendingUp className="w-3.5 h-3.5" />;
     if (deltaType === "decrease") return <TrendingDown className="w-3.5 h-3.5" />;
     return <Minus className="w-3.5 h-3.5" />;

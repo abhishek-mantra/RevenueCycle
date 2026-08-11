@@ -165,8 +165,43 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Practice Fee Schedule Manager */}
+        {/* Practice Fee Schedule Section (11.3) */}
         <FeeScheduleSection />
+
+        {/* Practice Team & User Access Control (11.9) */}
+        <div className="neu p-6 space-y-4 bg-[var(--surface)]">
+          <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+            <h2 className="text-[15px] font-bold text-[var(--foreground)] flex items-center gap-2">
+              <User className="w-4.5 h-4.5 text-[var(--accent)]" />
+              Practice Team & Role Access Control
+            </h2>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-black/5">
+              4 Active Team Members
+            </span>
+          </div>
+
+          <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)] text-xs">
+            {[
+              { name: "Dr. Rachel Vance, PsyD", role: "Attending Clinical Provider", npi: "1982049102", email: "rachel.vance@mantracare.com", status: "Active" },
+              { name: "Alex River", role: "Lead Billing Specialist", npi: "1002941829", email: "alex.river@mantracare.com", status: "Active" },
+              { name: "Dr. Marcus Thorne, MD", role: "Supervising Psychiatrist", npi: "1882940192", email: "marcus.thorne@mantracare.com", status: "Active" },
+              { name: "Elena Rostova", role: "Intake & Eligibility Officer", npi: "N/A (Staff)", email: "elena.r@mantracare.com", status: "Active" },
+            ].map((member, idx) => (
+              <div key={idx} className="p-4 flex items-center justify-between hover:bg-[var(--surface-muted)] transition-colors">
+                <div className="space-y-0.5">
+                  <div className="font-bold text-[14px] text-[var(--foreground)]">{member.name}</div>
+                  <div className="text-[var(--foreground-muted)] font-medium">
+                    {member.role} • <span className="font-mono text-[var(--foreground)]">NPI: {member.npi}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[var(--foreground-faint)] font-mono">{member.email}</span>
+                  <StatusBadge tone="success" label={member.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Stage 9 Reset Demo Data Action */}
         <div className="neu p-6 space-y-3 border border-[var(--status-critical)]/20 bg-[var(--surface)]">

@@ -5,10 +5,12 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { mockPayerPerformance, mockContractVariances } from "@/data/mockAnalytics";
 import { CheckCircle2, ShieldAlert } from "lucide-react";
 
 export default function PayerPerformancePage() {
+  const { claims } = useRcmDataStore();
   const [activeTab, setActiveTab] = useState<"performance" | "variance" | "reconciliation">("performance");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 

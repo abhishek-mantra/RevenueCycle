@@ -28,6 +28,7 @@ import {
   FileCode,
   Radio,
   Layers,
+  DollarSign,
 } from "lucide-react";
 
 interface NavItem {
@@ -72,6 +73,7 @@ export const Sidebar: React.FC = () => {
       title: "ACTION ITEMS",
       items: [
         { label: "Denial Management", href: "/worklist/denials", icon: <AlertTriangle className="w-4 h-4" />, badge: 12 },
+        { label: "Payment Posting", href: "/worklist/payment-posting", icon: <DollarSign className="w-4 h-4" />, badge: "ERA" },
         { label: "Import Errors", href: "/worklist/import-errors", icon: <AlertCircle className="w-4 h-4" />, badge: 2 },
         { label: "Payer Mappings", href: "/worklist/payer-mapping", icon: <Layers className="w-4 h-4" />, badge: 4 },
         { label: "Submission Errors", href: "/worklist/submission-errors", icon: <FileCode className="w-4 h-4" />, badge: 4 },
@@ -89,6 +91,7 @@ export const Sidebar: React.FC = () => {
       title: "AUTOMATION CONFIG",
       items: [
         { label: "Scrub Rules Engine", href: "/automation/rules", icon: <Sliders className="w-4 h-4" /> },
+        { label: "Prior Authorizations", href: "/automation/prior-auth", icon: <ShieldAlert className="w-4 h-4" /> },
         { label: "Insurance Intake", href: "/automation/insurance-intake", icon: <FileCheck2 className="w-4 h-4" /> },
         { label: "Patient Flow", href: "/automation/patient-flow", icon: <Zap className="w-4 h-4" /> },
         { label: "Patient Statements", href: "/automation/patient-statements", icon: <Receipt className="w-4 h-4" /> },

@@ -5,16 +5,43 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { mockPayerPerformance, mockContractVariances } from "@/data/mockAnalytics";
-import { ArrowLeft, ShieldCheck, DollarSign, Clock, FileText, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, DollarSign, Clock, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function PayerContractDetailPage({ params }: { params: Promise<{ payerId: string }> }) {
   const resolvedParams = use(params);
   const payerIdParam = resolvedParams.payerId;
+  const { claims } = useRcmDataStore();
 
   const payer = mockPayerPerformance.find(
     (p) => p.id === payerIdParam || p.payerName.toLowerCase().replace(/ /g, "-") === payerIdParam.toLowerCase()
-  ) || mockPayerPerformance[0];
+  );
+
+  if (!payer) {
+    return (
+      <AppShell>
+        <div className="max-w-xl mx-auto py-16 text-center space-y-4">
+          <div className="neu p-8 rounded-3xl bg-[var(--surface)] space-y-4 select-none">
+            <AlertCircle className="w-12 h-12 text-[var(--status-critical)] mx-auto" />
+            <h2 className="text-[20px] font-extrabold text-[var(--foreground)]">Payer Contract Not Found</h2>
+            <p className="text-xs text-[var(--foreground-muted)] font-medium">
+              No active contract metrics found for payer ID: <span className="font-mono font-bold">{payerIdParam}</span>
+            </p>
+            <Link href="/insights/payer-performance">
+              <button className="px-4 py-2 rounded-xl bg-[var(--accent)] text-white font-bold text-xs hover:bg-[var(--accent-hover)] transition-all cursor-pointer">
+                Return to Payer Performance
+              </button>
+            </Link>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const payerClaims = claims.filter((c) => c.payerName.toLowerCase().includes(payer.payerName.toLowerCase().split(" ")[0]));
+  const livePaid = payerClaims.reduce((acc, c) => acc + (c.paidAmount || 0), 0);
+  const liveBilled = payerClaims.reduce((acc, c) => acc + (c.billedAmount || c.submittedAmount || 0), 0);
 
   const variances = mockContractVariances.filter(
     (v) => v.payerName.toLowerCase() === payer.payerName.toLowerCase()

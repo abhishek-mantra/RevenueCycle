@@ -131,6 +131,58 @@ export const initialPatientCredits: PatientCreditRecord[] = [
   { patientId: "PAT-102", patientName: "Michael Chang", availableCredit: 75.0, lastUpdated: "2026-07-28" },
 ];
 
+export interface PriorAuthRecord {
+  id: string;
+  patientId: string;
+  patientName: string;
+  payerName: string;
+  cptCode: string;
+  authNumber: string;
+  visitsAuthorized: number;
+  visitsUsed: number;
+  expirationDate: string;
+  status: "Active" | "ExpiringSoon" | "Exhausted";
+}
+
+export const initialPriorAuths: PriorAuthRecord[] = [
+  {
+    id: "PA-501",
+    patientId: "PAT-101",
+    patientName: "Sarah Jenkins",
+    payerName: "Blue Cross Blue Shield",
+    cptCode: "90837",
+    authNumber: "AUTH-BCBS-9042",
+    visitsAuthorized: 20,
+    visitsUsed: 14,
+    expirationDate: "2026-10-15",
+    status: "Active",
+  },
+  {
+    id: "PA-502",
+    patientId: "PAT-102",
+    patientName: "Michael Chang",
+    payerName: "Aetna Behavioral Health",
+    cptCode: "90791",
+    authNumber: "AUTH-AET-8819",
+    visitsAuthorized: 12,
+    visitsUsed: 11,
+    expirationDate: "2026-08-30",
+    status: "ExpiringSoon",
+  },
+  {
+    id: "PA-503",
+    patientId: "PAT-103",
+    patientName: "Emily Watson",
+    payerName: "United Healthcare",
+    cptCode: "90834",
+    authNumber: "AUTH-UHC-3301",
+    visitsAuthorized: 10,
+    visitsUsed: 10,
+    expirationDate: "2026-07-31",
+    status: "Exhausted",
+  },
+];
+
 interface RcmDataState {
   claims: Claim[];
   denialClusters: DenialClusterGroup[];
@@ -143,10 +195,19 @@ interface RcmDataState {
   scrubRules: ScrubRule[];
   feeSchedule: FeeScheduleItem[];
   patientCredits: PatientCreditRecord[];
+  priorAuths: PriorAuthRecord[];
+  hasHydrated: boolean;
 
   // Actions
+  setHasHydrated: (state: boolean) => void;
   updateClaimStatus: (claimId: string, status: Claim["status"]) => void;
   resubmitClaims: (claimIds: string[]) => void;
+  addClaimNote: (claimId: string, text: string, author?: string) => void;
+  reconcileEraPayment: (
+    claimId: string,
+    paidAmount: number,
+    adjustments: { reasonCode: string; amount: number; note: string }[]
+  ) => void;
   resolveDenialCluster: (clusterId: string) => void;
   resolveDenialClaim: (clusterId: string, claimId: string) => void;
 
@@ -164,6 +225,8 @@ interface RcmDataState {
   addScrubRule: (rule: Omit<ScrubRule, "id" | "claimsScrubbedCount" | "lastTriggered">) => void;
   updateFeeScheduleItem: (cptCode: string, providerRate: number, description?: string) => void;
   applyPatientCredit: (patientId: string, amount: number) => void;
+  addPriorAuth: (auth: Omit<PriorAuthRecord, "id">) => void;
+  updatePriorAuthVisits: (id: string, deltaVisits: number) => void;
 
   resetDemoData: () => void;
 }
@@ -182,6 +245,10 @@ export const useRcmDataStore = create<RcmDataState>()(
       scrubRules: initialScrubRules,
       feeSchedule: initialFeeSchedule,
       patientCredits: initialPatientCredits,
+      priorAuths: initialPriorAuths,
+      hasHydrated: false,
+
+      setHasHydrated: (state: boolean) => set({ hasHydrated: state }),
 
       updateClaimStatus: (claimId, status) => {
         set((state) => ({
@@ -414,6 +481,63 @@ export const useRcmDataStore = create<RcmDataState>()(
         }));
       },
 
+      addClaimNote: (claimId, text, author = "Alex River (Biller)") => {
+        set((state) => ({
+          claims: state.claims.map((c) => {
+            if (c.id === claimId || c.claimId === claimId) {
+              const currentNotes = c.notes || [];
+              const newNote = {
+                id: `NOTE-${Date.now()}`,
+                author,
+                timestamp: new Date().toLocaleString([], { dateStyle: "short", timeStyle: "short" }),
+                text,
+              };
+              return { ...c, notes: [newNote, ...currentNotes] };
+            }
+            return c;
+          }),
+        }));
+      },
+
+      reconcileEraPayment: (claimId, paidAmount, adjustments) => {
+        set((state) => ({
+          claims: state.claims.map((c) => {
+            if (c.id === claimId || c.claimId === claimId) {
+              return {
+                ...c,
+                paidAmount,
+                status: "Paid" as Claim["status"],
+                adjustmentsList: adjustments,
+              };
+            }
+            return c;
+          }),
+        }));
+      },
+
+      addPriorAuth: (authData) => {
+        const newAuth: PriorAuthRecord = {
+          ...authData,
+          id: `PA-${Date.now().toString().slice(-4)}`,
+        };
+        set((state) => ({
+          priorAuths: [newAuth, ...state.priorAuths],
+        }));
+      },
+
+      updatePriorAuthVisits: (id, deltaVisits) => {
+        set((state) => ({
+          priorAuths: state.priorAuths.map((pa) => {
+            if (pa.id === id) {
+              const newUsed = Math.min(pa.visitsAuthorized, Math.max(0, pa.visitsUsed + deltaVisits));
+              const newStatus = newUsed >= pa.visitsAuthorized ? "Exhausted" : newUsed >= pa.visitsAuthorized - 2 ? "ExpiringSoon" : "Active";
+              return { ...pa, visitsUsed: newUsed, status: newStatus as PriorAuthRecord["status"] };
+            }
+            return pa;
+          }),
+        }));
+      },
+
       resetDemoData: () => {
         set({
           claims: mockClaims,
@@ -427,11 +551,37 @@ export const useRcmDataStore = create<RcmDataState>()(
           scrubRules: initialScrubRules,
           feeSchedule: initialFeeSchedule,
           patientCredits: initialPatientCredits,
+          priorAuths: initialPriorAuths,
         });
       },
     }),
     {
       name: "mantracare_rcm_store",
+      version: 1,
+      migrate: (persistedState: any, version: number) => {
+        if (version !== 1) {
+          // Schema version mismatch reset guard
+          return {
+            claims: mockClaims,
+            denialClusters: mockDenialClusters,
+            encounters: mockEncounters,
+            appointments: mockAppointments,
+            invoices: mockInvoices,
+            patientArBalances: mockPatientArBalances,
+            clawbacks: mockClawbacks,
+            credentialingRecords: mockCredentialingVault,
+            scrubRules: initialScrubRules,
+            feeSchedule: initialFeeSchedule,
+            patientCredits: initialPatientCredits,
+            priorAuths: initialPriorAuths,
+            hasHydrated: false,
+          };
+        }
+        return persistedState;
+      },
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
       storage: createJSONStorage(() => localStorage),
     }
   )

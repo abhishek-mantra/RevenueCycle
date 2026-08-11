@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { mockMonthlyRevenueData } from "@/data/mockAnalytics";
 import {
   BarChart,
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 
 export default function RevenueAnalysisPage() {
+  const { claims, invoices } = useRcmDataStore();
   const [dateAxis, setDateAxis] = useState<"DatePosted" | "DateOfService" | "CheckDate">("DatePosted");
   const [sliceSegment, setSliceSegment] = useState<"Payer" | "Provider" | "CPT" | "Facility">("Payer");
   const [isMounted, setIsMounted] = useState(false);
@@ -30,8 +32,8 @@ export default function RevenueAnalysisPage() {
     setIsMounted(true);
   }, []);
 
-  const totalInsurance = mockMonthlyRevenueData.reduce((acc, m) => acc + m.insurancePaid, 0);
-  const totalPatient = mockMonthlyRevenueData.reduce((acc, m) => acc + m.patientPaid, 0);
+  const totalInsurance = claims.reduce((acc, c) => acc + (c.paidAmount || 0), 0) || mockMonthlyRevenueData.reduce((acc, m) => acc + m.insurancePaid, 0);
+  const totalPatient = invoices.reduce((acc, i) => acc + (i.amountPaid || 0), 0) || mockMonthlyRevenueData.reduce((acc, m) => acc + m.patientPaid, 0);
   const totalGross = totalInsurance + totalPatient;
 
   return (

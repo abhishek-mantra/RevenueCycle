@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassModal } from "@/components/ui/glass-modal";
-import { mockCredentialingVault } from "@/data/mockCredentialing";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { CredentialingVaultEntry } from "@/schema/credentialingSchema";
 import { formatDate } from "@/lib/formatDate";
 import {
@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 export default function CredentialingPage() {
+  const { credentialingRecords } = useRcmDataStore();
   const [testServiceDate, setTestServiceDate] = useState("2026-08-04");
   const [activeCheckResult, setActiveCheckResult] = useState<{
     valid: boolean;
@@ -148,7 +149,7 @@ export default function CredentialingPage() {
           </div>
 
           <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)]">
-            {mockCredentialingVault.map((entry) => (
+            {credentialingRecords.map((entry) => (
               <div
                 key={entry.id}
                 className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[var(--surface-muted)] transition-colors"

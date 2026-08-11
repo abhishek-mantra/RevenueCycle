@@ -13,6 +13,7 @@ import { BulkActionBar } from "@/components/ui/bulk-action-bar";
 import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { formatDate } from "@/lib/formatDate";
 import { Claim } from "@/schema/claimSchema";
+import { exportToCsv } from "@/lib/exportCsv";
 import {
   FileText,
   Clock,
@@ -24,6 +25,7 @@ import {
   RotateCw,
   Send,
   ExternalLink,
+  Download,
 } from "lucide-react";
 
 export default function ClaimsPage() {
@@ -238,6 +240,25 @@ export default function ClaimsPage() {
                 className="neu-pressed pl-10 pr-4 py-2 text-[13px] text-[var(--foreground)] placeholder-[var(--foreground-faint)] w-full outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all rounded-full"
               />
             </div>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                exportToCsv("mantracare_claims_report", filteredClaims, [
+                  { key: "claimId", label: "Claim ID" },
+                  { key: "patientName", label: "Patient Name" },
+                  { key: "payerName", label: "Payer Name" },
+                  { key: "cptCode", label: "CPT Code" },
+                  { key: "serviceDate", label: "Service Date" },
+                  { key: "billedAmount", label: "Billed Amount ($)" },
+                  { key: "paidAmount", label: "Paid Amount ($)" },
+                  { key: "status", label: "Claim Status" },
+                ])
+              }
+            >
+              <Download className="w-3.5 h-3.5 mr-1" /> Export CSV
+            </Button>
 
             {/* Lifecycle Status Filter Tabs */}
             <div className="neu-pressed p-1 rounded-full flex items-center gap-1 text-[12px] overflow-x-auto">
