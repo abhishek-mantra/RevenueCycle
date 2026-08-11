@@ -71,7 +71,6 @@ export const Sidebar: React.FC = () => {
     {
       title: "ACTION ITEMS",
       items: [
-        { label: "All Action Items Hub", href: "/worklist", icon: <ShieldAlert className="w-4 h-4" />, badge: 30, badgeColor: "bg-[var(--status-critical-bg)] text-[var(--status-critical)]" },
         { label: "Denial Management", href: "/worklist/denials", icon: <AlertTriangle className="w-4 h-4" />, badge: 12 },
         { label: "Import Errors", href: "/worklist/import-errors", icon: <AlertCircle className="w-4 h-4" />, badge: 2 },
         { label: "Payer Mappings", href: "/worklist/payer-mapping", icon: <Layers className="w-4 h-4" />, badge: 4 },

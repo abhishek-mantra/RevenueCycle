@@ -80,19 +80,19 @@ export const AiAssistantPanel: React.FC = () => {
 
   return (
     <>
-      {/* Persistent Vertical Right Edge Tab Affordance */}
+      {/* Persistent Right Edge Arrow Trigger */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Open AI Assistant Panel"
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 glass-chrome bg-[var(--accent)] text-white px-2 py-3.5 rounded-l-2xl shadow-2xl flex flex-col items-center gap-2 hover:bg-[var(--accent-hover)] hover:w-11 transition-all group cursor-pointer border border-r-0 border-white/40"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-[var(--accent)] text-white px-2.5 py-4 rounded-l-2xl shadow-2xl flex flex-col items-center gap-2.5 hover:bg-[var(--accent)]/90 transition-colors group cursor-pointer border border-r-0 border-white/20 select-none"
           title="Open AI Assistant Panel"
         >
-          <Sparkles className="w-4 h-4 animate-pulse group-hover:scale-110 transition-transform" />
-          <span className="text-[10px] font-bold uppercase tracking-widest writing-mode-vertical rotate-180 py-1">
+          <ChevronLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
+          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+          <span className="text-[10px] font-extrabold uppercase tracking-widest writing-mode-vertical rotate-180 py-1 text-white/90">
             AI Assistant
           </span>
-          <ChevronLeft className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100" />
         </button>
       )}
 
