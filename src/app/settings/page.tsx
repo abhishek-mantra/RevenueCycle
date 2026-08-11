@@ -165,6 +165,9 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Practice Fee Schedule Manager */}
+        <FeeScheduleSection />
+
         {/* Stage 9 Reset Demo Data Action */}
         <div className="neu p-6 space-y-3 border border-[var(--status-critical)]/20 bg-[var(--surface)]">
           <div className="flex items-center justify-between">
@@ -185,5 +188,113 @@ export default function SettingsPage() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function FeeScheduleSection() {
+  const { feeSchedule, updateFeeScheduleItem } = useRcmDataStore();
+  const [showAdd, setShowAdd] = useState(false);
+  const [newCpt, setNewCpt] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  const [newRate, setNewRate] = useState("");
+
+  const handleAdd = () => {
+    if (!newCpt.trim() || !newRate) return;
+    updateFeeScheduleItem(newCpt.trim().toUpperCase(), Number(newRate), newDesc.trim() || undefined);
+    setNewCpt("");
+    setNewDesc("");
+    setNewRate("");
+    setShowAdd(false);
+  };
+
+  return (
+    <div className="neu p-6 space-y-4 bg-[var(--surface)]">
+      <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+        <div>
+          <h2 className="text-[15px] font-bold text-[var(--foreground)] flex items-center gap-2">
+            <Settings className="w-4.5 h-4.5 text-[var(--accent)]" />
+            Practice Charge Master & CPT Fee Schedule
+          </h2>
+          <p className="text-xs text-[var(--foreground-muted)] font-medium mt-0.5">
+            Default provider asking rates per CPT code used across encounter billing and patient invoicing.
+          </p>
+        </div>
+
+        <Button size="sm" onClick={() => setShowAdd(!showAdd)}>
+          {showAdd ? "Cancel" : "+ Add CPT Rate"}
+        </Button>
+      </div>
+
+      {showAdd && (
+        <div className="p-4 neu-pressed rounded-2xl space-y-3">
+          <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">
+            Define New CPT Asking Rate
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label className="block font-bold text-[var(--foreground)] mb-1">CPT Code *</label>
+              <input
+                type="text"
+                value={newCpt}
+                onChange={(e) => setNewCpt(e.target.value)}
+                placeholder="e.g. 90837"
+                className="w-full bg-[var(--surface)] px-3 py-1.5 rounded-xl text-[12px] border border-[var(--border)] outline-none"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-[var(--foreground)] mb-1">Service Description</label>
+              <input
+                type="text"
+                value={newDesc}
+                onChange={(e) => setNewDesc(e.target.value)}
+                placeholder="e.g. Psychotherapy, 60 min"
+                className="w-full bg-[var(--surface)] px-3 py-1.5 rounded-xl text-[12px] border border-[var(--border)] outline-none"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-[var(--foreground)] mb-1">Standard Rate ($) *</label>
+              <input
+                type="number"
+                value={newRate}
+                onChange={(e) => setNewRate(e.target.value)}
+                placeholder="e.g. 175.00"
+                className="w-full bg-[var(--surface)] px-3 py-1.5 rounded-xl text-[12px] border border-[var(--border)] outline-none"
+              />
+            </div>
+          </div>
+          <Button size="sm" onClick={handleAdd} disabled={!newCpt.trim() || !newRate}>
+            Save to Fee Schedule
+          </Button>
+        </div>
+      )}
+
+      <div className="overflow-x-auto custom-scrollbar">
+        <table className="w-full text-xs text-left select-none">
+          <thead>
+            <tr className="border-b border-[var(--border)] text-[var(--foreground-faint)] uppercase font-bold text-[10px] tracking-wider">
+              <th className="py-2.5 px-3">CPT Code</th>
+              <th className="py-2.5 px-3">Service Description</th>
+              <th className="py-2.5 px-3 text-right">Practice Standard Rate ($)</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[var(--border)] font-medium">
+            {feeSchedule.map((item) => (
+              <tr key={item.cptCode} className="hover:bg-[var(--surface-muted)]/50 transition-colors">
+                <td className="py-2.5 px-3 font-mono font-bold text-[var(--foreground)]">{item.cptCode}</td>
+                <td className="py-2.5 px-3 text-[var(--foreground-muted)]">{item.description}</td>
+                <td className="py-2.5 px-3 text-right">
+                  <input
+                    type="number"
+                    value={item.providerRate}
+                    onChange={(e) => updateFeeScheduleItem(item.cptCode, Number(e.target.value), item.description)}
+                    className="w-24 text-right px-2 py-1 rounded-lg bg-[var(--surface-muted)] text-[var(--foreground)] font-bold border border-[var(--border)] outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

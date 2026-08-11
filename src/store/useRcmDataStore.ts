@@ -104,6 +104,21 @@ const initialScrubRules: ScrubRule[] = [
   },
 ];
 
+export interface FeeScheduleItem {
+  cptCode: string;
+  description: string;
+  providerRate: number;
+}
+
+export const initialFeeSchedule: FeeScheduleItem[] = [
+  { cptCode: "90837", description: "Psychotherapy, 60 min with patient", providerRate: 175.0 },
+  { cptCode: "90834", description: "Psychotherapy, 45 min with patient", providerRate: 140.0 },
+  { cptCode: "90791", description: "Psychiatric Diagnostic Evaluation", providerRate: 210.0 },
+  { cptCode: "99214", description: "Office Visit, Established Patient (Moderate)", providerRate: 165.0 },
+  { cptCode: "90839", description: "Psychotherapy for Crisis, First 60 min", providerRate: 230.0 },
+  { cptCode: "90847", description: "Family Psychotherapy with Patient Present", providerRate: 185.0 },
+];
+
 interface RcmDataState {
   claims: Claim[];
   denialClusters: DenialClusterGroup[];
@@ -114,6 +129,7 @@ interface RcmDataState {
   clawbacks: ClawbackEntry[];
   credentialingRecords: CredentialingVaultEntry[];
   scrubRules: ScrubRule[];
+  feeSchedule: FeeScheduleItem[];
 
   // Actions
   updateClaimStatus: (claimId: string, status: Claim["status"]) => void;
@@ -133,6 +149,7 @@ interface RcmDataState {
 
   toggleScrubRule: (ruleId: string) => void;
   addScrubRule: (rule: Omit<ScrubRule, "id" | "claimsScrubbedCount" | "lastTriggered">) => void;
+  updateFeeScheduleItem: (cptCode: string, providerRate: number, description?: string) => void;
 
   resetDemoData: () => void;
 }
@@ -149,6 +166,7 @@ export const useRcmDataStore = create<RcmDataState>()(
       clawbacks: mockClawbacks,
       credentialingRecords: mockCredentialingVault,
       scrubRules: initialScrubRules,
+      feeSchedule: initialFeeSchedule,
 
       updateClaimStatus: (claimId, status) => {
         set((state) => ({
@@ -349,6 +367,28 @@ export const useRcmDataStore = create<RcmDataState>()(
         }));
       },
 
+      updateFeeScheduleItem: (cptCode, providerRate, description) => {
+        set((state) => {
+          const exists = state.feeSchedule.some((f) => f.cptCode === cptCode);
+          if (exists) {
+            return {
+              feeSchedule: state.feeSchedule.map((f) =>
+                f.cptCode === cptCode
+                  ? { ...f, providerRate, ...(description ? { description } : {}) }
+                  : f
+              ),
+            };
+          } else {
+            return {
+              feeSchedule: [
+                ...state.feeSchedule,
+                { cptCode, providerRate, description: description || "Custom CPT Code Rate" },
+              ],
+            };
+          }
+        });
+      },
+
       resetDemoData: () => {
         set({
           claims: mockClaims,
@@ -360,6 +400,7 @@ export const useRcmDataStore = create<RcmDataState>()(
           clawbacks: mockClawbacks,
           credentialingRecords: mockCredentialingVault,
           scrubRules: initialScrubRules,
+          feeSchedule: initialFeeSchedule,
         });
       },
     }),

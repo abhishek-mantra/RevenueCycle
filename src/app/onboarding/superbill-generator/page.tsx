@@ -4,13 +4,15 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
+import { useRcmDataStore } from "@/store/useRcmDataStore";
 import { ArrowLeft, Save, FileText, CheckCircle2, Printer } from "lucide-react";
 import Link from "next/link";
 
 export default function HistoricalSuperbillGeneratorPage() {
   const router = useRouter();
+  const { encounters, appointments } = useRcmDataStore();
 
-  const [patientName, setPatientName] = useState("");
+  const [patientName, setPatientName] = useState("Sarah Jenkins");
   const [cptCode, setCptCode] = useState("90837");
   const [icdCode, setIcdCode] = useState("F41.1");
   const [serviceDate, setServiceDate] = useState("2026-07-15");
