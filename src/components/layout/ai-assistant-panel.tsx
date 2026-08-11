@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X, Send, Bot, User, ChevronRight, Zap, FileText, CheckCircle2, Sliders } from "lucide-react";
+import { Sparkles, X, Send, Bot, User, ChevronLeft, ChevronRight, Zap, FileText, CheckCircle2, Sliders } from "lucide-react";
 import { clsx } from "clsx";
 
 interface Message {
@@ -127,33 +127,27 @@ export const AiAssistantPanel: React.FC = () => {
 
   return (
     <>
-      {/* Premium Neumorphic Edge Trigger Pill */}
+      {/* Minimalist Right Edge Glass Arrow Trigger */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Open AI Assistant Panel"
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 neu bg-[var(--surface)] text-[var(--foreground)] border border-white/80 shadow-2xl rounded-l-2xl py-3 px-2 flex flex-col items-center gap-2 hover:translate-x-[-3px] transition-all cursor-pointer select-none group"
-          title="Open MantraCare AI Silent Partner"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 glass-chrome bg-white/85 p-3 rounded-l-2xl shadow-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all group cursor-pointer border border-r-0 border-white/80 text-[var(--foreground-muted)] select-none"
+          title="Open MantraCare AI Assistant Panel"
         >
-          <div className="w-8 h-8 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center group-hover:bg-[var(--accent)] group-hover:text-white transition-all shadow-xs">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <span className="writing-vertical text-[9px] font-extrabold tracking-widest text-[var(--foreground-muted)] uppercase group-hover:text-[var(--accent)] transition-colors">
-            AI Silent Partner
-          </span>
-          <span className="w-2 h-2 rounded-full bg-[var(--status-success)] animate-pulse" />
+          <ChevronLeft className="w-5 h-5 text-[var(--foreground)] group-hover:text-[var(--accent)] group-hover:-translate-x-0.5 transition-all" />
         </button>
       )}
 
-      {/* Slide-out Persistent Drawer Panel */}
+      {/* Floating Inset Glass Panel (Not Edge-to-Edge Block) */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            initial={{ x: "110%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "110%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 380, damping: 32 }}
-            className="fixed top-0 right-0 bottom-0 w-[410px] max-w-[90vw] z-50 glass-chrome bg-[var(--surface)]/95 backdrop-blur-2xl border-l border-[var(--border)] shadow-2xl flex flex-col select-none"
+            className="fixed top-4 bottom-4 right-4 w-[400px] max-w-[calc(100vw-32px)] z-50 glass-chrome bg-[var(--surface)]/95 backdrop-blur-2xl border border-white/80 rounded-3xl shadow-2xl flex flex-col overflow-hidden select-none"
           >
             {/* Drawer Header */}
             <div className="p-4 border-b border-[var(--border)] flex items-center justify-between bg-[var(--surface)]">
