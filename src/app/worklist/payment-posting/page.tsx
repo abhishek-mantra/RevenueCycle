@@ -214,7 +214,7 @@ export default function PaymentPostingPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-[var(--foreground)] mb-1">
+              <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">
                 Actual Payer ERA Remittance Paid Amount ($) *
               </label>
               <input
@@ -222,18 +222,18 @@ export default function PaymentPostingPage() {
                 value={remittanceAmount}
                 onChange={(e) => setRemittanceAmount(e.target.value)}
                 placeholder="e.g. 140.00"
-                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-[13px] text-[var(--foreground)] font-bold bg-transparent outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-extrabold bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-[var(--foreground)] mb-1">
+              <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">
                 Contractual Write-Off Adjustment Reason
               </label>
               <select
                 value={adjustmentReason}
                 onChange={(e) => setAdjustmentReason(e.target.value)}
-                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-[13px] text-[var(--foreground)] bg-transparent outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-medium bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
               >
                 <option value="Contractual Write-off">CO-45 Contractual Adjustment</option>
                 <option value="Small Balance Removal">CO-Small Balance Waiver (&lt;$10)</option>
@@ -243,7 +243,7 @@ export default function PaymentPostingPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-[var(--foreground)] mb-1">
+              <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">
                 Internal Audit Note / CARC Code Detail
               </label>
               <input
@@ -251,16 +251,16 @@ export default function PaymentPostingPage() {
                 value={adjustmentNote}
                 onChange={(e) => setAdjustmentNote(e.target.value)}
                 placeholder="e.g. CO-45 Fee Schedule Difference"
-                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-[13px] text-[var(--foreground)] bg-transparent outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-medium bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[var(--border)]">
-              <Button variant="secondary" size="sm" onClick={() => setActiveReconcileClaim(null)}>
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border)] mt-2">
+              <Button variant="secondary" size="md" onClick={() => setActiveReconcileClaim(null)}>
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" onClick={handlePostPayment} disabled={!remittanceAmount}>
-                <ShieldCheck className="w-4 h-4" /> Post & Reconcile ERA
+              <Button variant="primary" size="md" onClick={handlePostPayment} disabled={!remittanceAmount}>
+                <ShieldCheck className="w-4 h-4 mr-1" /> Post & Reconcile ERA
               </Button>
             </div>
           </div>

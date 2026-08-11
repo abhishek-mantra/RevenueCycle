@@ -94,7 +94,10 @@ export default function ClaimsPage() {
       key: "patientName",
       header: "Patient",
       accessor: (row) => (
-        <Link href={`/claims/${row.claimId}`} className="font-semibold text-[var(--foreground)] hover:text-[var(--accent)] transition-colors">
+        <Link
+          href={`/patients/${row.patientName === "Sarah Jenkins" ? "PAT-101" : row.patientName === "Michael Chang" ? "PAT-102" : "PAT-103"}`}
+          className="font-bold text-[var(--foreground)] hover:text-[var(--accent)] hover:underline transition-colors"
+        >
           {row.patientName}
         </Link>
       ),

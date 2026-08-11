@@ -51,31 +51,34 @@ export const GlassModal: React.FC<GlassModalProps> = ({
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            initial={{ opacity: 0, scale: 0.95, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className={clsx("glass-panel w-full p-6 relative z-10 shadow-2xl", maxWidth)}
+            exit={{ opacity: 0, scale: 0.95, y: 12 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className={clsx(
+              "glass-panel rounded-3xl p-7 relative z-10 shadow-2xl border border-white/90 select-none",
+              maxWidth
+            )}
           >
-            <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-[var(--border)] mb-5">
               <div>
                 {title && (
-                  <h3 className="text-[20px] font-bold tracking-tight text-[var(--foreground)]">
+                  <h3 className="text-[20px] font-black tracking-tight text-[var(--foreground)]">
                     {title}
                   </h3>
                 )}
                 {description && (
-                  <p className="text-[13px] text-[var(--foreground-muted)] mt-1">
+                  <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">
                     {description}
                   </p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--accent-soft)] transition-colors cursor-pointer"
+                className="p-2 rounded-2xl neu-soft hover:bg-[var(--accent-soft)] text-[var(--foreground-muted)] hover:text-[var(--accent)] transition-all cursor-pointer shrink-0"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4.5 h-4.5" />
               </button>
             </div>
 

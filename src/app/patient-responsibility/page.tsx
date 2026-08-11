@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -134,7 +135,12 @@ export default function PatientResponsibilityPage() {
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-[15px] font-bold text-[var(--foreground)]">{bal.patientName}</h3>
+                      <Link
+                        href={`/patients/${bal.patientId}`}
+                        className="text-[15px] font-bold text-[var(--foreground)] hover:text-[var(--accent)] hover:underline transition-colors"
+                      >
+                        {bal.patientName}
+                      </Link>
                       {bal.hasActiveClawback && (
                         <StatusBadge tone="warning" label="Active Clawback Flag" />
                       )}

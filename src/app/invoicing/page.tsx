@@ -196,7 +196,7 @@ export default function InvoicingPage() {
                       </div>
 
                       <h3 className="text-[15px] font-bold text-[var(--foreground)]">
-                        <Link href={`/invoicing/${inv.id}`} className="hover:text-[var(--accent)] transition-colors">
+                        <Link href={`/patients/${inv.patientName === "Sarah Jenkins" ? "PAT-101" : inv.patientName === "Michael Chang" ? "PAT-102" : "PAT-103"}`} className="hover:text-[var(--accent)] hover:underline transition-colors font-bold text-[var(--foreground)]">
                           {inv.patientName}
                         </Link>{" "}
                         — <span className="text-[var(--foreground-muted)] font-medium">{inv.patientEmail}</span>

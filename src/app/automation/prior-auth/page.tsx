@@ -158,25 +158,25 @@ export default function PriorAuthPage() {
         title="Create Prior Authorization Record"
         description="Attach approved authorization number and visit allowance to patient profile."
       >
-        <div className="space-y-4 text-xs select-none">
+        <div className="space-y-4 text-xs select-none pt-1">
           <div>
-            <label className="block font-bold text-[var(--foreground)] mb-1">Patient Name *</label>
+            <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">Patient Name *</label>
             <input
               type="text"
               value={patientName}
               onChange={(e) => setPatientName(e.target.value)}
               placeholder="e.g. Sarah Jenkins"
-              className="w-full neu-pressed px-3.5 py-2 rounded-xl text-xs text-[var(--foreground)] bg-transparent outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-medium bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3.5">
             <div>
-              <label className="block font-bold text-[var(--foreground)] mb-1">Payer Name</label>
+              <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">Payer Name</label>
               <select
                 value={payerName}
                 onChange={(e) => setPayerName(e.target.value)}
-                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-xs text-[var(--foreground)] bg-transparent outline-none"
+                className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-medium bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
               >
                 <option value="Blue Cross Blue Shield">Blue Cross Blue Shield</option>
                 <option value="Aetna Behavioral Health">Aetna Behavioral Health</option>
@@ -186,54 +186,54 @@ export default function PriorAuthPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-[var(--foreground)] mb-1">CPT Code</label>
+              <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">CPT Code</label>
               <input
                 type="text"
                 value={cptCode}
                 onChange={(e) => setCptCode(e.target.value)}
-                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-xs text-[var(--foreground)] font-mono font-bold bg-transparent outline-none"
+                className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-mono font-bold bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3.5">
             <div>
-              <label className="block font-bold text-[var(--foreground)] mb-1">Auth # *</label>
+              <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">Auth # *</label>
               <input
                 type="text"
                 value={authNumber}
                 onChange={(e) => setAuthNumber(e.target.value)}
                 placeholder="e.g. AUTH-BCBS-9042"
-                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-xs text-[var(--foreground)] font-mono font-bold bg-transparent outline-none"
+                className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-mono font-bold bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-[var(--foreground)] mb-1">Visits Authorized</label>
+              <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">Visits Authorized</label>
               <input
                 type="number"
                 value={visitsAuthorized}
                 onChange={(e) => setVisitsAuthorized(e.target.value)}
-                className="w-full neu-pressed px-3.5 py-2 rounded-xl text-xs text-[var(--foreground)] font-bold bg-transparent outline-none"
+                className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-bold bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-[var(--foreground)] mb-1">Expiration Date</label>
+            <label className="block font-bold text-[var(--foreground)] mb-1 text-[11.5px]">Expiration Date</label>
             <input
               type="date"
               value={expirationDate}
               onChange={(e) => setExpirationDate(e.target.value)}
-              className="w-full neu-pressed px-3.5 py-2 rounded-xl text-xs text-[var(--foreground)] bg-transparent outline-none"
+              className="w-full neu-pressed px-4 py-2.5 rounded-2xl text-[13px] text-[var(--foreground)] font-medium bg-transparent border border-[var(--border)] outline-none focus:border-[var(--accent)] transition-all"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[var(--border)]">
-            <Button variant="secondary" size="sm" onClick={() => setIsNewAuthModalOpen(false)}>
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border)] mt-2">
+            <Button variant="secondary" size="md" onClick={() => setIsNewAuthModalOpen(false)}>
               Cancel
             </Button>
-            <Button variant="primary" size="sm" onClick={handleCreateAuth} disabled={!patientName || !authNumber}>
+            <Button variant="primary" size="md" onClick={handleCreateAuth} disabled={!patientName || !authNumber}>
               Create Auth Record
             </Button>
           </div>
