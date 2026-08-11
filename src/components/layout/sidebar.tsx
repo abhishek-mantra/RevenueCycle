@@ -99,26 +99,21 @@ export const Sidebar: React.FC = () => {
     },
   ];
 
-  // Initialize expanded sections: only expand the section containing active route on load
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+  // Pinned sections state: permanently open when clicked, or active route section on initial load
+  const [pinnedSections, setPinnedSections] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     sections.forEach((sec) => {
       const hasActive = sec.items.some((item) => pathname.startsWith(item.href));
       initial[sec.title] = hasActive;
     });
-    // Fallback: if no active section found, default INSIGHTS & ANALYTICS or DAILY OPERATIONS open
     if (!Object.values(initial).some(Boolean)) {
       initial["DAILY OPERATIONS"] = true;
     }
     return initial;
   });
 
-  const toggleSection = (title: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
-  };
+  // Hovered section state: temporary preview while mouse is over section
+  const [hoveredSection, setHoveredSection] = useState<string | null>(null);
 
   return (
     <aside
@@ -165,18 +160,25 @@ export const Sidebar: React.FC = () => {
         {/* Navigation Sections */}
         <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
           {sections.map((section) => {
-            const isExpanded = !!expandedSections[section.title];
+            const isPinned = !!pinnedSections[section.title];
+            const isHovered = hoveredSection === section.title;
+            const isExpanded = isPinned || isHovered;
             const hasActiveChild = section.items.some((item) => pathname.startsWith(item.href));
 
             return (
-              <div key={section.title} className="space-y-1">
+              <div
+                key={section.title}
+                className="space-y-1"
+                onMouseEnter={() => setHoveredSection(section.title)}
+                onMouseLeave={() => setHoveredSection((curr) => (curr === section.title ? null : curr))}
+              >
                 {!sidebarCollapsed ? (
                   <button
-                    onClick={() => toggleSection(section.title)}
-                    onMouseEnter={() => {
-                      if (!expandedSections[section.title]) {
-                        setExpandedSections((prev) => ({ ...prev, [section.title]: true }));
-                      }
+                    onClick={() => {
+                      setPinnedSections((prev) => ({
+                        ...prev,
+                        [section.title]: !prev[section.title],
+                      }));
                     }}
                     aria-label={`Toggle ${section.title} section`}
                     aria-expanded={isExpanded}
