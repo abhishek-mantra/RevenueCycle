@@ -88,7 +88,7 @@ export const Topbar: React.FC = () => {
     <header
       className={clsx(
         "glass-chrome fixed top-4 right-4 z-30 transition-all duration-300 px-5 py-3 flex items-center justify-between shadow-xl border border-white/70 select-none rounded-3xl h-14",
-        sidebarCollapsed ? "left-24" : "left-76"
+        sidebarCollapsed ? "left-28" : "left-72"
       )}
     >
       {/* Left: Clean Breadcrumb & Live Ops Indicator */}
