@@ -110,7 +110,7 @@ export default function OverviewPage() {
               </span>
             </div>
             <p className="text-[13px] text-[var(--foreground-muted)] font-medium mt-1">
-              Top-line health indicators, automated plain-English revenue callouts, interactive charts, and contract variance alerts.
+              Real-time practice revenue health, clean-claim automation metrics, and automated payer performance analytics.
             </p>
           </div>
 
