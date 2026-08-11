@@ -173,19 +173,18 @@ export const Sidebar: React.FC = () => {
                 {!sidebarCollapsed ? (
                   <button
                     onClick={() => toggleSection(section.title)}
+                    onMouseEnter={() => {
+                      if (!expandedSections[section.title]) {
+                        setExpandedSections((prev) => ({ ...prev, [section.title]: true }));
+                      }
+                    }}
                     aria-label={`Toggle ${section.title} section`}
                     aria-expanded={isExpanded}
-                    className="w-full px-2 py-1.5 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[var(--foreground-faint)] hover:text-[var(--foreground)] hover:bg-[var(--accent-soft)]/40 transition-all rounded-xl group cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 border-none"
+                    className="w-full px-2 py-2 flex items-center justify-between text-[12px] font-extrabold uppercase tracking-wider text-[var(--foreground-muted)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)]/50 transition-all rounded-xl group cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 border-none"
                   >
-                    <span className={clsx(hasActiveChild && !isExpanded && "text-[var(--accent)] font-extrabold")}>
+                    <span className={clsx((hasActiveChild || isExpanded) ? "text-[var(--accent)] font-black" : "text-[var(--foreground-muted)]")}>
                       {section.title}
                     </span>
-                    <ChevronDown
-                      className={clsx(
-                        "w-3.5 h-3.5 transition-transform duration-200 text-[var(--foreground-faint)] group-hover:text-[var(--foreground)]",
-                        isExpanded && "rotate-180"
-                      )}
-                    />
                   </button>
                 ) : null}
 

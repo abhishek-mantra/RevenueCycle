@@ -80,19 +80,15 @@ export const AiAssistantPanel: React.FC = () => {
 
   return (
     <>
-      {/* Persistent Right Edge Arrow Trigger */}
+      {/* Minimalist Right Edge Glass Arrow Trigger */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Open AI Assistant Panel"
-          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-[var(--accent)] text-white px-2.5 py-4 rounded-l-2xl shadow-2xl flex flex-col items-center gap-2.5 hover:bg-[var(--accent)]/90 transition-colors group cursor-pointer border border-r-0 border-white/20 select-none"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-50 glass-chrome bg-white/85 p-3 rounded-l-2xl shadow-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all group cursor-pointer border border-r-0 border-white/80 text-[var(--foreground-muted)] select-none"
           title="Open AI Assistant Panel"
         >
-          <ChevronLeft className="w-4 h-4 text-white group-hover:-translate-x-1 transition-transform" />
-          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-          <span className="text-[10px] font-extrabold uppercase tracking-widest writing-mode-vertical rotate-180 py-1 text-white/90">
-            AI Assistant
-          </span>
+          <ChevronLeft className="w-5 h-5 text-[var(--foreground)] group-hover:text-[var(--accent)] group-hover:-translate-x-0.5 transition-all" />
         </button>
       )}
 
