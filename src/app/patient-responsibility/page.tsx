@@ -121,8 +121,12 @@ export default function PatientResponsibilityPage() {
           </div>
 
           {activeTab === "balances" ? (
-            /* Decoupled AR Table */
-            <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)]">
+            <div className="space-y-4">
+              {/* Patient Credit Ledger Card */}
+              <PatientCreditLedgerCard showToast={showToast} />
+
+              {/* Decoupled AR Table */}
+              <div className="divide-y divide-[var(--border)] border border-[var(--border)] rounded-2xl overflow-hidden bg-[var(--surface)]">
               {patientArBalances.map((bal) => (
                 <div
                   key={bal.id}
@@ -161,17 +165,20 @@ export default function PatientResponsibilityPage() {
                       </div>
                     </div>
 
-                    <Button
-                      size="sm"
-                      variant={bal.invoiceableBalance > 0 ? "primary" : "secondary"}
-                      disabled={bal.invoiceableBalance === 0}
-                      onClick={() => showToast(`Generated statement for ${bal.patientName} ($${bal.invoiceableBalance.toFixed(2)})`)}
-                    >
-                      {bal.invoiceableBalance > 0 ? "Generate Statement" : "Awaiting ERA"}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant={bal.invoiceableBalance > 0 ? "primary" : "secondary"}
+                        disabled={bal.invoiceableBalance === 0}
+                        onClick={() => showToast(`Generated statement for ${bal.patientName} ($${bal.invoiceableBalance.toFixed(2)})`)}
+                      >
+                        {bal.invoiceableBalance > 0 ? "Generate Statement" : "Awaiting ERA"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
+            </div>
             </div>
           ) : (
             /* Clawback Ledger View */
@@ -270,5 +277,58 @@ export default function PatientResponsibilityPage() {
         </GlassModal>
       </div>
     </AppShell>
+  );
+}
+
+function PatientCreditLedgerCard({ showToast }: { showToast: (msg: string) => void }) {
+  const { patientCredits, applyPatientCredit } = useRcmDataStore();
+  const totalCreditAvailable = patientCredits.reduce((sum, c) => sum + c.availableCredit, 0);
+
+  if (totalCreditAvailable === 0) return null;
+
+  return (
+    <div className="p-4 neu-pressed rounded-2xl space-y-3 bg-[var(--surface-muted)]/50">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-[var(--status-success-bg)] text-[var(--status-success)] flex items-center justify-center font-bold">
+            💳
+          </div>
+          <div>
+            <h3 className="text-[13px] font-bold text-[var(--foreground)]">
+              Active Patient Overpayment Credit Ledger
+            </h3>
+            <p className="text-[11px] text-[var(--foreground-muted)] font-medium">
+              Available uncaptured credits from past overpayments or advance copayments ready to apply to open balances.
+            </p>
+          </div>
+        </div>
+
+        <span className="text-xs font-extrabold text-[var(--status-success)] bg-[var(--status-success-bg)] px-3 py-1 rounded-full border border-[var(--status-success)]/20">
+          ${totalCreditAvailable.toFixed(2)} Total Available
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs pt-1">
+        {patientCredits.map((cred) => (
+          <div key={cred.patientId} className="p-3 bg-[var(--surface)] neu-soft rounded-xl flex items-center justify-between border border-[var(--border)]">
+            <div>
+              <div className="font-bold text-[var(--foreground)]">{cred.patientName}</div>
+              <div className="text-[10px] text-[var(--foreground-muted)]">Available Credit: ${cred.availableCredit.toFixed(2)}</div>
+            </div>
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={cred.availableCredit === 0}
+              onClick={() => {
+                applyPatientCredit(cred.patientId, cred.availableCredit);
+                showToast(`Applied $${cred.availableCredit.toFixed(2)} credit to ${cred.patientName}'s balance!`);
+              }}
+            >
+              Apply Credit
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

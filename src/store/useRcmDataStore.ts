@@ -119,6 +119,18 @@ export const initialFeeSchedule: FeeScheduleItem[] = [
   { cptCode: "90847", description: "Family Psychotherapy with Patient Present", providerRate: 185.0 },
 ];
 
+export interface PatientCreditRecord {
+  patientId: string;
+  patientName: string;
+  availableCredit: number;
+  lastUpdated: string;
+}
+
+export const initialPatientCredits: PatientCreditRecord[] = [
+  { patientId: "PAT-101", patientName: "Sarah Jenkins", availableCredit: 45.0, lastUpdated: "2026-08-01" },
+  { patientId: "PAT-102", patientName: "Michael Chang", availableCredit: 75.0, lastUpdated: "2026-07-28" },
+];
+
 interface RcmDataState {
   claims: Claim[];
   denialClusters: DenialClusterGroup[];
@@ -130,6 +142,7 @@ interface RcmDataState {
   credentialingRecords: CredentialingVaultEntry[];
   scrubRules: ScrubRule[];
   feeSchedule: FeeScheduleItem[];
+  patientCredits: PatientCreditRecord[];
 
   // Actions
   updateClaimStatus: (claimId: string, status: Claim["status"]) => void;
@@ -144,12 +157,13 @@ interface RcmDataState {
   recordInvoicePayment: (
     invoiceId: string,
     amount: number,
-    method: "Card" | "PayLink" | "PaymentPlan"
+    method: "Card" | "PayLink" | "PaymentPlan" | "CreditApply"
   ) => void;
 
   toggleScrubRule: (ruleId: string) => void;
   addScrubRule: (rule: Omit<ScrubRule, "id" | "claimsScrubbedCount" | "lastTriggered">) => void;
   updateFeeScheduleItem: (cptCode: string, providerRate: number, description?: string) => void;
+  applyPatientCredit: (patientId: string, amount: number) => void;
 
   resetDemoData: () => void;
 }
@@ -167,6 +181,7 @@ export const useRcmDataStore = create<RcmDataState>()(
       credentialingRecords: mockCredentialingVault,
       scrubRules: initialScrubRules,
       feeSchedule: initialFeeSchedule,
+      patientCredits: initialPatientCredits,
 
       updateClaimStatus: (claimId, status) => {
         set((state) => ({
@@ -389,6 +404,16 @@ export const useRcmDataStore = create<RcmDataState>()(
         });
       },
 
+      applyPatientCredit: (patientId, amount) => {
+        set((state) => ({
+          patientCredits: state.patientCredits.map((c) =>
+            c.patientId === patientId || c.patientName.toLowerCase().includes(patientId.toLowerCase())
+              ? { ...c, availableCredit: Math.max(0, c.availableCredit - amount) }
+              : c
+          ),
+        }));
+      },
+
       resetDemoData: () => {
         set({
           claims: mockClaims,
@@ -401,6 +426,7 @@ export const useRcmDataStore = create<RcmDataState>()(
           credentialingRecords: mockCredentialingVault,
           scrubRules: initialScrubRules,
           feeSchedule: initialFeeSchedule,
+          patientCredits: initialPatientCredits,
         });
       },
     }),
