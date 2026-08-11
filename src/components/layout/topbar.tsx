@@ -65,21 +65,39 @@ export const Topbar: React.FC = () => {
     matchingClaims.length > 0 || matchingPatients.length > 0 || matchingDenials.length > 0;
 
   const getBreadcrumb = () => {
-    if (pathname.includes("/insights/overview")) return { group: "Insights", title: "Overview" };
-    if (pathname.includes("/insights/revenue-analysis")) return { group: "Insights", title: "Revenue Analysis" };
-    if (pathname.includes("/insights/payer-performance")) return { group: "Insights", title: "Payer Performance" };
-    if (pathname.includes("/insights/ai-insights")) return { group: "Insights", title: "AI Assistant" };
-    if (pathname.includes("/appointments")) return { group: "Daily Operations", title: "Appointments" };
-    if (pathname.includes("/encounters")) return { group: "Daily Operations", title: "Encounters" };
-    if (pathname.includes("/claims")) return { group: "Daily Operations", title: "Claims" };
-    if (pathname.includes("/invoicing")) return { group: "Daily Operations", title: "Invoicing" };
-    if (pathname.includes("/patient-responsibility")) return { group: "Daily Operations", title: "Patient Responsibility" };
-    if (pathname.includes("/onboarding")) return { group: "Daily Operations", title: "Onboarding" };
-    if (pathname.includes("/worklist")) return { group: "Action Items", title: "Action Items" };
-    if (pathname.includes("/credentialing")) return { group: "Credentialing", title: "Credentialing" };
-    if (pathname.includes("/automation")) return { group: "Automation", title: "Automation Rules" };
-    if (pathname.includes("/settings")) return { group: "System", title: "Settings" };
-    return { group: "MantraCare", title: "Operations" };
+    if (pathname.includes("/insights/overview")) return { group: "INSIGHTS & ANALYTICS", title: "Overview" };
+    if (pathname.includes("/insights/revenue-analysis")) return { group: "INSIGHTS & ANALYTICS", title: "Revenue Analysis" };
+    if (pathname.includes("/insights/payer-performance")) return { group: "INSIGHTS & ANALYTICS", title: "Payer Performance" };
+    if (pathname.includes("/insights/ai-insights")) return { group: "INSIGHTS & ANALYTICS", title: "AI Assistant" };
+
+    if (pathname.includes("/appointments")) return { group: "DAILY OPERATIONS", title: "Pre-Visit & Eligibility" };
+    if (pathname.includes("/encounters")) return { group: "DAILY OPERATIONS", title: "Encounters" };
+    if (pathname.includes("/claims")) return { group: "DAILY OPERATIONS", title: "Claim Status" };
+    if (pathname.includes("/invoicing")) return { group: "DAILY OPERATIONS", title: "Invoicing & Billing" };
+    if (pathname.includes("/patient-responsibility")) return { group: "DAILY OPERATIONS", title: "Patient AR & Balances" };
+    if (pathname.includes("/patients")) return { group: "DAILY OPERATIONS", title: "Patient Profile" };
+    if (pathname.includes("/onboarding")) return { group: "DAILY OPERATIONS", title: "Migration / Onboarding" };
+
+    // Action Items sub-routes
+    if (pathname.includes("/worklist/payment-posting")) return { group: "ACTION ITEMS", title: "Payment Posting" };
+    if (pathname.includes("/worklist/import-errors")) return { group: "ACTION ITEMS", title: "Import Errors" };
+    if (pathname.includes("/worklist/payer-mapping")) return { group: "ACTION ITEMS", title: "Payer Mappings" };
+    if (pathname.includes("/worklist/submission-errors")) return { group: "ACTION ITEMS", title: "Submission Errors" };
+    if (pathname.includes("/worklist/rejections")) return { group: "ACTION ITEMS", title: "Payer Rejections" };
+    if (pathname.includes("/worklist/edi-era")) return { group: "ACTION ITEMS", title: "EDI / ERA Enrollments" };
+    if (pathname.includes("/worklist")) return { group: "ACTION ITEMS", title: "Denial Management" };
+
+    if (pathname.includes("/credentialing")) return { group: "CREDENTIALING", title: "Payer Credentialing" };
+
+    // Automation sub-routes
+    if (pathname.includes("/automation/prior-auth")) return { group: "AUTOMATION CONFIG", title: "Prior Authorizations" };
+    if (pathname.includes("/automation/insurance-intake")) return { group: "AUTOMATION CONFIG", title: "Insurance Intake" };
+    if (pathname.includes("/automation/patient-flow")) return { group: "AUTOMATION CONFIG", title: "Patient Flow" };
+    if (pathname.includes("/automation/patient-statements")) return { group: "AUTOMATION CONFIG", title: "Patient Statements" };
+    if (pathname.includes("/automation")) return { group: "AUTOMATION CONFIG", title: "Scrub Rules Engine" };
+
+    if (pathname.includes("/settings")) return { group: "SYSTEM", title: "Settings & Profile" };
+    return { group: "INSIGHTS & ANALYTICS", title: "Overview" };
   };
 
   const breadcrumb = getBreadcrumb();

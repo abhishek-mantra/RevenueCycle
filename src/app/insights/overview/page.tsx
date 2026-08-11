@@ -130,7 +130,7 @@ export default function OverviewPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href="/worklist">
+            <Link href="/worklist/denials">
               <Button variant="secondary" size="sm">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
                 <span>Action Items Queue ({denialClusters.length} Active Clusters)</span>
@@ -334,9 +334,12 @@ export default function OverviewPage() {
               <div key={varItem.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <Link
+                      href={`/claims/${varItem.claimId}`}
+                      className="font-mono font-bold text-xs px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all"
+                    >
                       {varItem.claimId}
-                    </span>
+                    </Link>
                     <span className="font-bold text-xs text-[var(--foreground)]">{varItem.payerName} — CPT {varItem.cptCode}</span>
                   </div>
                   <div className="text-xs text-[var(--foreground-muted)] font-medium">
